@@ -680,5 +680,146 @@ def report_generate(target, type, format):
         console.print(f"[bold green]✓ Report saved: {output}[/bold green]")
 
 
+# ==================== Training Commands ====================
+
+@cli.group()
+def train():
+    """LLM training and fine-tuning commands"""
+    pass
+
+
+@train.command("collect-dataset")
+@click.option("--type", required=True, type=click.Choice(["cve", "exploit", "qa", "all"]), help="Dataset type")
+@click.option("--max-items", default=1000, help="Maximum items to collect")
+def train_collect_dataset(type, max_items):
+    """Collect security training dataset"""
+    from modules.training.dataset_manager import DatasetManager
+
+    console.print(f"[bold green]📚 Collecting {type} dataset...[/bold green]")
+
+    manager = DatasetManager()
+
+    if type == "cve":
+        output = manager.collect_cve_dataset(max_items)
+    elif type == "exploit":
+        output = manager.collect_exploit_dataset()
+    elif type == "qa":
+        output = manager.collect_security_qa_dataset()
+    elif type == "all":
+        console.print("[*] Collecting all datasets...")
+        manager.collect_cve_dataset(max_items)
+        manager.collect_exploit_dataset()
+        output = manager.collect_security_qa_dataset()
+
+    if output:
+        console.print(f"[bold green]✓ Dataset saved: {output}[/bold green]")
+
+
+@train.command("prepare-data")
+@click.option("--datasets", required=True, help="Dataset files (comma-separated)")
+@click.option("--format", default="alpaca", type=click.Choice(["alpaca", "sharegpt"]), help="Output format")
+def train_prepare_data(datasets, format):
+    """Prepare and merge datasets for training"""
+    from modules.training.dataset_manager import DatasetManager
+
+    console.print(f"[bold green]🔧 Preparing training data...[/bold green]")
+
+    manager = DatasetManager()
+    dataset_files = [d.strip() for d in datasets.split(",")]
+
+    output = manager.prepare_training_data(dataset_files, format)
+
+    if output:
+        console.print(f"[bold green]✓ Training data ready: {output}[/bold green]")
+
+
+@train.command("fine-tune")
+@click.option("--base-model", required=True, help="Base model (e.g., llama3.1:8b)")
+@click.option("--dataset", required=True, help="Training dataset file")
+@click.option("--name", required=True, help="Fine-tuned model name")
+def train_fine_tune(base_model, dataset, name):
+    """Fine-tune model on security dataset"""
+    from modules.training.model_trainer import ModelTrainer
+
+    console.print(f"[bold green]🚀 Fine-tuning {base_model}...[/bold green]")
+    console.print(f"[bold cyan]Dataset: {dataset}[/bold cyan]")
+    console.print(f"[bold cyan]New model: {name}[/bold cyan]\n")
+
+    trainer = ModelTrainer()
+    success = trainer.fine_tune_with_ollama(base_model, dataset, name)
+
+    if success:
+        console.print(f"\n[bold green]✓ Model fine-tuned successfully![/bold green]")
+        console.print(f"[bold cyan]Usage: ollama run {name}[/bold cyan]")
+        console.print(f"[bold cyan]Or update config.yaml: llm.model = \"{name}\"[/bold cyan]")
+    else:
+        console.print(f"\n[bold red]✗ Fine-tuning failed[/bold red]")
+
+
+@train.command("evaluate")
+@click.option("--model", required=True, help="Model to evaluate")
+def train_evaluate(model):
+    """Evaluate model on security benchmark"""
+    from modules.training.model_evaluator import ModelEvaluator
+
+    console.print(f"[bold green]📊 Evaluating model: {model}[/bold green]\n")
+
+    evaluator = ModelEvaluator()
+    results = evaluator.evaluate_on_benchmark(model)
+
+    console.print(f"\n[bold green]✓ Evaluation complete![/bold green]")
+    console.print(f"[bold cyan]Accuracy: {results['accuracy']:.2%}[/bold cyan]")
+    console.print(f"[bold cyan]Avg Response Time: {results['avg_response_time']:.2f}s[/bold cyan]")
+
+
+@train.command("compare")
+@click.option("--models", required=True, help="Models to compare (comma-separated)")
+def train_compare(models):
+    """Compare multiple models"""
+    from modules.training.model_evaluator import ModelEvaluator
+
+    model_list = [m.strip() for m in models.split(",")]
+
+    console.print(f"[bold green]📊 Comparing {len(model_list)} models...[/bold green]\n")
+
+    evaluator = ModelEvaluator()
+    results = evaluator.compare_models(model_list)
+
+    console.print(f"\n[bold green]✓ Comparison complete![/bold green]")
+
+
+@train.command("validate")
+@click.option("--dataset", required=True, help="Dataset file to validate")
+def train_validate(dataset):
+    """Validate dataset format and quality"""
+    from modules.training.dataset_manager import DatasetManager
+
+    console.print(f"[bold green]✅ Validating dataset: {dataset}[/bold green]\n")
+
+    manager = DatasetManager()
+    result = manager.validate_dataset(dataset)
+
+    if result["is_valid"]:
+        console.print(f"[bold green]✓ Dataset is valid![/bold green]")
+    else:
+        console.print(f"[bold red]✗ Dataset has issues[/bold red]")
+
+
+@train.command("list-datasets")
+def train_list_datasets():
+    """List available datasets"""
+    from modules.training.dataset_manager import DatasetManager
+
+    console.print(f"[bold green]📚 Available datasets:[/bold green]\n")
+
+    manager = DatasetManager()
+    datasets = manager.list_datasets()
+
+    for dataset in datasets:
+        console.print(f"  • {dataset}")
+
+    console.print(f"\n[bold cyan]Total: {len(datasets)} datasets[/bold cyan]")
+
+
 if __name__ == "__main__":
     cli()
