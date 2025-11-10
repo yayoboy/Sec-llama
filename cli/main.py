@@ -399,5 +399,286 @@ def doctor():
     console.print(table)
 
 
+# ==================== Agent Commands ====================
+
+@cli.group()
+def agent():
+    """Multi-agent collaborative testing commands"""
+    pass
+
+
+@agent.command("collab-assess")
+@click.option("--target", required=True, help="Target to assess")
+@click.option("--objective", default="full_security_assessment", help="Assessment objective")
+def agent_collab_assess(target, objective):
+    """Run collaborative security assessment with all agents"""
+    from agents.coordinator import AgentCoordinator
+
+    console.print(f"[bold green]🤖 Starting collaborative assessment on {target}...[/bold green]")
+
+    coordinator = AgentCoordinator()
+    results = coordinator.run_collaborative_assessment(target, objective)
+
+    console.print(f"\n[bold green]✓ Assessment complete![/bold green]")
+
+
+@agent.command("status")
+def agent_status():
+    """Show status of all agents"""
+    from agents.coordinator import AgentCoordinator
+
+    coordinator = AgentCoordinator()
+    status = coordinator.get_agent_status()
+
+    table = Table(title="Agent Status")
+    table.add_column("Agent", style="cyan")
+    table.add_column("Type", style="green")
+    table.add_column("Tasks", style="yellow")
+
+    for agent_id, info in status.items():
+        table.add_row(agent_id, info["type"], str(info["tasks_completed"]))
+
+    console.print(table)
+
+
+# ==================== Log Analysis Commands ====================
+
+@cli.group()
+def logs():
+    """Log analysis and SIEM commands"""
+    pass
+
+
+@logs.command("analyze")
+@click.option("--file", required=True, help="Log file to analyze")
+@click.option("--type", default="auto", help="Log type (apache, nginx, auth, auto)")
+def logs_analyze(file, type):
+    """Analyze security logs"""
+    from modules.log_analyzer.log_parser import LogParser
+
+    console.print(f"[bold green]📊 Analyzing logs: {file}...[/bold green]")
+
+    parser = LogParser()
+    logs = parser.parse_log_file(file, type)
+
+    console.print(f"\n[bold green]✓ Parsed {len(logs)} log entries[/bold green]")
+
+
+@logs.command("find-attacks")
+@click.option("--file", required=True, help="Log file to analyze")
+def logs_find_attacks(file):
+    """Find potential attacks in logs"""
+    from modules.log_analyzer.log_parser import LogParser
+
+    console.print(f"[bold yellow]🔍 Searching for attacks in {file}...[/bold yellow]")
+
+    parser = LogParser()
+    parser.parse_log_file(file)
+    attacks = parser.find_attacks()
+
+    for attack in attacks[:10]:
+        console.print(f"[red]⚠️  {attack['type']}: {attack['log'].get('path', 'N/A')}[/red]")
+
+
+# ==================== Incident Response Commands ====================
+
+@cli.group()
+def incident():
+    """Incident response commands"""
+    pass
+
+
+@incident.command("create")
+@click.option("--title", required=True, help="Incident title")
+@click.option("--description", required=True, help="Incident description")
+@click.option("--severity", default="MEDIUM", help="Severity (LOW/MEDIUM/HIGH/CRITICAL)")
+def incident_create(title, description, severity):
+    """Create new incident and generate IR playbook"""
+    from modules.incident_response.ir_orchestrator import IncidentResponseOrchestrator
+
+    console.print(f"[bold red]🚨 Creating incident: {title}[/bold red]")
+
+    ir = IncidentResponseOrchestrator()
+    incident = ir.create_incident(title, description, severity)
+
+    console.print(f"\n[bold green]✓ Incident created: {incident['id']}[/bold green]")
+
+
+@incident.command("contain")
+@click.option("--id", required=True, help="Incident ID")
+def incident_contain(id):
+    """Execute containment actions"""
+    from modules.incident_response.ir_orchestrator import IncidentResponseOrchestrator
+
+    console.print(f"[bold yellow]🛡️  Executing containment for {id}...[/bold yellow]")
+
+    ir = IncidentResponseOrchestrator()
+    result = ir.execute_containment(id)
+
+    if result["status"] == "success":
+        console.print(f"\n[bold green]✓ Containment plan generated[/bold green]")
+
+
+# ==================== Code Review Commands ====================
+
+@cli.group()
+def review():
+    """Code review commands"""
+    pass
+
+
+@review.command("commit")
+@click.option("--hash", required=True, help="Commit hash")
+@click.option("--repo", default=".", help="Repository path")
+def review_commit(hash, repo):
+    """Review a Git commit for security issues"""
+    from modules.code_review.git_reviewer import GitCodeReviewer
+
+    console.print(f"[bold green]👀 Reviewing commit {hash}...[/bold green]")
+
+    reviewer = GitCodeReviewer()
+    result = reviewer.review_commit(hash, repo)
+
+    if result["status"] == "success":
+        console.print(f"\n[bold green]✓ Review complete[/bold green]")
+
+
+@review.command("pr")
+@click.option("--number", required=True, type=int, help="PR number")
+@click.option("--repo", required=True, help="Repository (owner/repo)")
+def review_pr(number, repo):
+    """Review a GitHub Pull Request"""
+    from modules.code_review.git_reviewer import GitCodeReviewer
+
+    console.print(f"[bold green]👀 Reviewing PR #{number}...[/bold green]")
+
+    reviewer = GitCodeReviewer()
+    result = reviewer.review_pr(number, repo)
+
+    if result["status"] == "success":
+        console.print(f"\n[bold green]✓ Review complete[/bold green]")
+
+
+@review.command("file")
+@click.option("--path", required=True, help="File path")
+def review_file(path):
+    """Review a single file"""
+    from modules.code_review.git_reviewer import GitCodeReviewer
+
+    console.print(f"[bold green]👀 Reviewing file: {path}...[/bold green]")
+
+    reviewer = GitCodeReviewer()
+    result = reviewer.review_file(path)
+
+
+# ==================== Container Security Commands ====================
+
+@cli.group()
+def container():
+    """Container security commands"""
+    pass
+
+
+@container.command("scan-image")
+@click.option("--image", required=True, help="Docker image name")
+def container_scan_image(image):
+    """Scan Docker image for vulnerabilities"""
+    from modules.container_security.docker_scanner import DockerScanner
+
+    console.print(f"[bold green]🐳 Scanning image: {image}...[/bold green]")
+
+    scanner = DockerScanner()
+    results = scanner.scan_image(image)
+
+    console.print(f"\n[bold green]✓ Found {len(results['vulnerabilities'])} vulnerabilities[/bold green]")
+
+
+@container.command("scan-running")
+def container_scan_running():
+    """Scan all running containers"""
+    from modules.container_security.docker_scanner import DockerScanner
+
+    console.print(f"[bold green]🐳 Scanning running containers...[/bold green]")
+
+    scanner = DockerScanner()
+    results = scanner.scan_running_containers()
+
+    console.print(f"\n[bold green]✓ Scanned {len(results)} containers[/bold green]")
+
+
+# ==================== API Security Commands ====================
+
+@cli.group()
+def api():
+    """API security testing commands"""
+    pass
+
+
+@api.command("fuzz")
+@click.option("--url", required=True, help="Base API URL")
+@click.option("--endpoint", required=True, help="Endpoint path")
+@click.option("--method", default="GET", help="HTTP method")
+def api_fuzz(url, endpoint, method):
+    """Fuzz API endpoint for vulnerabilities"""
+    from modules.api_security.api_fuzzer import APIFuzzer
+
+    console.print(f"[bold green]🔨 Fuzzing {method} {endpoint}...[/bold green]")
+
+    fuzzer = APIFuzzer()
+    results = fuzzer.fuzz_endpoint(url, endpoint, method)
+
+    interesting = [r for r in results if r.get("interesting")]
+    console.print(f"\n[bold yellow]⚠️  Found {len(interesting)} interesting responses[/bold yellow]")
+
+
+@api.command("test-auth")
+@click.option("--url", required=True, help="Login URL")
+def api_test_auth(url):
+    """Test API authentication"""
+    from modules.api_security.api_fuzzer import APIFuzzer
+
+    console.print(f"[bold green]🔐 Testing authentication: {url}...[/bold green]")
+
+    fuzzer = APIFuzzer()
+    results = fuzzer.test_authentication(url)
+
+    console.print(f"\n[bold green]✓ Tested {len(results['tests'])} credential combinations[/bold green]")
+
+
+# ==================== Reporting Commands ====================
+
+@cli.group()
+def report():
+    """Report generation commands"""
+    pass
+
+
+@report.command("generate")
+@click.option("--target", required=True, help="Target name")
+@click.option("--type", default="executive", type=click.Choice(["executive", "technical"]), help="Report type")
+@click.option("--format", default="html", type=click.Choice(["html", "pdf"]), help="Output format")
+def report_generate(target, type, format):
+    """Generate security assessment report"""
+    from modules.reporting.report_generator import ReportGenerator
+
+    console.print(f"[bold green]📄 Generating {type} report for {target}...[/bold green]")
+
+    generator = ReportGenerator()
+
+    # Mock findings for demo
+    findings = {"target": target, "vulnerabilities": []}
+
+    if format == "html":
+        if type == "executive":
+            output = generator.generate_executive_report(findings, target)
+        else:
+            output = generator.generate_technical_report(findings, target)
+    else:
+        output = generator.generate_pdf_report(findings, target, type)
+
+    if output:
+        console.print(f"[bold green]✓ Report saved: {output}[/bold green]")
+
+
 if __name__ == "__main__":
     cli()
