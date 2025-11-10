@@ -1,0 +1,195 @@
+# Sec-Llama Suite Configuration
+
+# LLM Configuration
+llm:
+  provider: "ollama"  # ollama, openai, localai
+  model: "llama3.1:8b"  # For better results: llama3.1:70b, mistral, codellama
+  base_url: "http://localhost:11434"
+  api_key: null  # Only for OpenAI-compatible APIs
+  temperature: 0.7
+  max_tokens: 4096
+  timeout: 120
+
+# RAG (Retrieval Augmented Generation) for CVE/Knowledge Base
+rag:
+  enabled: true
+  vector_db: "chromadb"
+  embedding_model: "all-MiniLM-L6-v2"
+  chunk_size: 1000
+  chunk_overlap: 200
+  top_k: 5
+
+# Network Security Settings
+network:
+  default_timeout: 30
+  max_threads: 10
+  stealth_mode: false  # Use slower, more stealthy scanning
+  interface: "eth0"  # Default network interface
+
+  # Scan profiles
+  scan_profiles:
+    quick:
+      ports: "22,80,443,3389,8080"
+      timing: "T4"
+    standard:
+      ports: "1-10000"
+      timing: "T3"
+    thorough:
+      ports: "1-65535"
+      timing: "T2"
+    stealth:
+      ports: "1-1000"
+      timing: "T1"
+
+# Scanning Tools Configuration
+scanning:
+  nmap:
+    path: "/usr/bin/nmap"
+    default_args: "-sV -sC --open"
+  masscan:
+    path: "/usr/bin/masscan"
+    rate: 1000
+  nuclei:
+    path: "/usr/bin/nuclei"
+    templates_path: "/usr/share/nuclei-templates"
+
+# Wireless Security
+wireless:
+  interface: "wlan0"
+  monitor_mode: true
+  aircrack_path: "/usr/bin/aircrack-ng"
+
+# Traffic Analysis
+traffic:
+  wireshark_path: "/usr/bin/tshark"
+  capture_filter: ""
+  display_filter: ""
+  max_packets: 10000
+
+# Code Security (SAST)
+code_security:
+  languages:
+    - python
+    - javascript
+    - java
+    - go
+    - php
+  bandit:
+    enabled: true
+    severity: ["MEDIUM", "HIGH", "CRITICAL"]
+  semgrep:
+    enabled: true
+    rules_path: "auto"
+
+# Exploitation
+exploitation:
+  metasploit:
+    enabled: false  # Requires msfconsole
+    path: "/usr/bin/msfconsole"
+  searchsploit:
+    enabled: true
+    path: "/usr/bin/searchsploit"
+
+# Threat Intelligence
+threat_intel:
+  cve_db_update: true  # Auto-update CVE database
+  update_interval: 86400  # 24 hours
+  sources:
+    - "nvd"  # NIST NVD
+    - "mitre"  # MITRE ATT&CK
+    - "exploit-db"
+  osint:
+    shodan_api_key: null
+    virustotal_api_key: null
+    censys_api_key: null
+
+# Reporting
+reporting:
+  output_dir: "./reports"
+  format: "pdf"  # pdf, html, json, markdown
+  include_screenshots: true
+  executive_summary: true
+  severity_threshold: "MEDIUM"  # Only report MEDIUM and above
+
+  # Report sections
+  sections:
+    - executive_summary
+    - methodology
+    - findings
+    - network_map
+    - vulnerability_details
+    - recommendations
+    - appendix
+
+# Database
+database:
+  type: "sqlite"  # sqlite, postgresql
+  path: "./database"
+
+  # PostgreSQL (if type: postgresql)
+  postgresql:
+    host: "localhost"
+    port: 5432
+    database: "sec_llama"
+    username: "secllama"
+    password: "changeme"
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file: "./logs/sec-llama.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  rotation: "10 MB"
+  retention: 10
+
+# API Server
+api:
+  enabled: false
+  host: "127.0.0.1"
+  port: 8000
+  cors_origins:
+    - "http://localhost:3000"
+  api_key_required: true
+
+# Web Dashboard
+web:
+  enabled: false
+  host: "127.0.0.1"
+  port: 3000
+
+# Multi-Agent System
+agents:
+  enabled: true
+  max_concurrent: 3
+
+  agents:
+    recon:
+      enabled: true
+      model: "llama3.1:8b"
+    exploit:
+      enabled: true
+      model: "llama3.1:70b"  # Needs more reasoning
+    defense:
+      enabled: true
+      model: "llama3.1:8b"
+
+# Performance
+performance:
+  cache_enabled: true
+  cache_ttl: 3600
+  parallel_scans: true
+  max_workers: 5
+
+# Security
+security:
+  require_confirmation: true  # Confirm before dangerous operations
+  authorized_networks:
+    - "192.168.1.0/24"
+    - "10.0.0.0/8"
+  log_all_operations: true
+
+# Advanced
+advanced:
+  debug_mode: false
+  verbose: false
+  dry_run: false  # Simulate without executing
