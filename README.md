@@ -135,6 +135,27 @@ pip install -r requirements.txt
 docker-compose up -d
 ```
 
+### Installazione su Live USB 💿 🆕
+
+**Sec-Llama può funzionare su distribuzioni live (Kali, Parrot, ecc.) con persistenza completa!**
+
+```bash
+# 1. Crea USB con persistenza (da Linux)
+sudo ./scripts/create_persistent_usb.sh /dev/sdX kali-linux-2024.iso 32GB
+
+# 2. Boot da USB e seleziona "Live USB Persistence"
+
+# 3. Setup automatico completo
+sudo ./scripts/setup_persistent_env.sh
+
+# 4. (Opzionale) Usa storage esterno per modelli
+sudo ./scripts/external_models_storage.sh sdc1
+```
+
+**Tutti i dati vengono salvati!** Reports, database, modelli LLM, configurazioni.
+
+📚 **[Guida Completa Live USB](docs/LIVE_USB_GUIDE.md)** - Setup, backup, troubleshooting
+
 ### Configurazione
 ```bash
 # Copia configurazione di esempio
@@ -347,7 +368,10 @@ docker-compose up -d
 
 ## 📖 Documentazione
 
-- [Guida Completa](docs/guide.md)
+- **[Guida Live USB](docs/LIVE_USB_GUIDE.md)** 🆕 - Setup su distribuzioni live con persistenza
+- **[Features Complete](docs/FEATURES.md)** - Lista completa 90+ funzionalità
+- **[Training Guide](docs/TRAINING.md)** - Sistema training e fine-tuning LLM
+- **[Quick Start](docs/QUICK_START.md)** - Guida rapida per iniziare
 - [API Reference](docs/api.md)
 - [Esempi Avanzati](docs/examples.md)
 - [Contribuire](docs/contributing.md)
