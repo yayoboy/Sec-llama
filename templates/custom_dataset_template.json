@@ -1,0 +1,97 @@
+[
+  {
+    "instruction": "Spiega come funziona un attacco [TIPO_ATTACCO]",
+    "input": "Descrivere [TIPO_ATTACCO] nel contesto di [SCENARIO]",
+    "output": "[TIPO_ATTACCO] è una tecnica che... [SPIEGAZIONE DETTAGLIATA]",
+    "metadata": {
+      "category": "offensive_security",
+      "difficulty": "medium",
+      "tags": ["attack", "exploitation"]
+    }
+  },
+  {
+    "instruction": "Analizza la vulnerabilità in questo codice",
+    "input": "```python\ndef login(username, password):\n    query = f\"SELECT * FROM users WHERE user='{username}' AND pass='{password}'\"\n    return db.execute(query)\n```",
+    "output": "Questo codice è vulnerabile a SQL Injection perché concatena direttamente l'input dell'utente nella query SQL senza sanitizzazione. Un attaccante potrebbe inserire: username=\"admin' --\" per bypassare l'autenticazione. \n\nCorrezione:\n```python\ndef login(username, password):\n    query = \"SELECT * FROM users WHERE user=? AND pass=?\"\n    return db.execute(query, (username, password))\n```\nUsare parametrized queries previene SQL injection.",
+    "metadata": {
+      "category": "code_security",
+      "language": "python",
+      "vulnerability": "sql_injection"
+    }
+  },
+  {
+    "instruction": "Suggerisci exploit per [SERVIZIO] versione [VERSIONE]",
+    "input": "Service: [SERVIZIO]\nVersion: [VERSIONE]\nPort: [PORTA]\nOS: [SISTEMA_OPERATIVO]",
+    "output": "[SERVIZIO] [VERSIONE] è vulnerabile a [CVE-ID] che permette [TIPO_EXPLOIT].\n\nExploit disponibili:\n1. Metasploit: exploit/[PERCORSO]\n2. Manual: [COMANDO]\n3. Script: [SCRIPT]\n\nSeverità: [CRITICAL/HIGH/MEDIUM/LOW]\nMitigazione: Aggiornare a versione [VERSIONE_SICURA]",
+    "metadata": {
+      "service": "[SERVIZIO]",
+      "cve": "[CVE-ID]",
+      "severity": "high"
+    }
+  },
+  {
+    "instruction": "Identifica indicatori di compromissione (IOC)",
+    "input": "Log entry: [LOG_ENTRY]",
+    "output": "IOC identificati:\n- IP: [IP_ADDRESS] (reputation: malicious)\n- User-Agent: [USER_AGENT] (scanner pattern)\n- Request pattern: [PATTERN] (attack signature)\n\nClassificazione: [TIPO_ATTACCO]\nAzione raccomandata: [AZIONE]",
+    "metadata": {
+      "ioc_type": "network",
+      "threat_level": "high"
+    }
+  },
+  {
+    "instruction": "Piano di privilege escalation per [OS]",
+    "input": "Operating System: [OS]\nCurrent privileges: [PRIVILEGI_ATTUALI]\nAvailable tools: [TOOLS]",
+    "output": "Strategie di privilege escalation per [OS]:\n\n1. [TECNICA_1]:\n   - Check: [COMANDO_CHECK]\n   - Exploit: [COMANDO_EXPLOIT]\n   - Probability: [ALTA/MEDIA/BASSA]\n\n2. [TECNICA_2]:\n   - Check: [COMANDO_CHECK]\n   - Exploit: [COMANDO_EXPLOIT]\n   - Probability: [ALTA/MEDIA/BASSA]\n\nStrumenti raccomandati: [TOOLS]",
+    "metadata": {
+      "os": "[OS]",
+      "phase": "post_exploitation"
+    }
+  },
+  {
+    "instruction": "Best practices per secure coding in [LINGUAGGIO]",
+    "input": "Language: [LINGUAGGIO]\nFramework: [FRAMEWORK]\nContext: [CONTESTO]",
+    "output": "Secure coding practices per [LINGUAGGIO]:\n\n1. Input Validation:\n   - [PRATICA_SPECIFICA]\n   \n2. Output Encoding:\n   - [PRATICA_SPECIFICA]\n   \n3. Authentication/Authorization:\n   - [PRATICA_SPECIFICA]\n   \n4. Cryptography:\n   - [PRATICA_SPECIFICA]\n   \n5. Error Handling:\n   - [PRATICA_SPECIFICA]\n\nFramework-specific ([FRAMEWORK]):\n- [BEST_PRACTICE_FRAMEWORK]",
+    "metadata": {
+      "language": "[LINGUAGGIO]",
+      "framework": "[FRAMEWORK]",
+      "category": "defensive_security"
+    }
+  },
+  {
+    "instruction": "Analizza network traffic per attività sospette",
+    "input": "Source IP: [SRC_IP]\nDestination IP: [DST_IP]\nPort: [PORT]\nProtocol: [PROTOCOL]\nPayload: [PAYLOAD]",
+    "output": "Analisi traffico:\n\n1. Pattern identificato: [PATTERN]\n2. Classificazione: [NORMALE/SOSPETTO/MALEVOLO]\n3. Indicatori:\n   - [INDICATORE_1]\n   - [INDICATORE_2]\n4. Rischio: [BASSO/MEDIO/ALTO/CRITICO]\n5. Azione raccomandata: [AZIONE]",
+    "metadata": {
+      "analysis_type": "network_traffic",
+      "protocol": "[PROTOCOL]"
+    }
+  },
+  {
+    "instruction": "Genera payload per [TIPO_EXPLOIT]",
+    "input": "Target: [TARGET]\nPlatform: [PLATFORM]\nEncoder: [ENCODER]\nBad chars: [BAD_CHARS]",
+    "output": "Payload [TIPO_EXPLOIT]:\n\n```\n[PAYLOAD_CODE]\n```\n\nCaratteristiche:\n- Size: [SIZE] bytes\n- Encoder: [ENCODER]\n- Platform: [PLATFORM]\n- Tested: [SI/NO]\n\nUsage:\n[ISTRUZIONI_USO]",
+    "metadata": {
+      "payload_type": "[TIPO]",
+      "platform": "[PLATFORM]"
+    }
+  },
+  {
+    "instruction": "Incident response per [TIPO_INCIDENTE]",
+    "input": "Incident type: [TIPO_INCIDENTE]\nAffected systems: [SISTEMI]\nInitial detection: [DETECTION]",
+    "output": "Piano di Incident Response:\n\nPhase 1 - Identification:\n- [AZIONI_IDENTIFICAZIONE]\n\nPhase 2 - Containment:\n- [AZIONI_CONTENIMENTO]\n\nPhase 3 - Eradication:\n- [AZIONI_ERADICAZIONE]\n\nPhase 4 - Recovery:\n- [AZIONI_RECOVERY]\n\nPhase 5 - Lessons Learned:\n- [AZIONI_POST_MORTEM]",
+    "metadata": {
+      "incident_type": "[TIPO]",
+      "severity": "high",
+      "framework": "NIST"
+    }
+  },
+  {
+    "instruction": "Threat hunting query per [THREAT]",
+    "input": "Threat: [THREAT]\nEnvironment: [ENVIRONMENT]\nAvailable logs: [LOGS]",
+    "output": "Threat Hunting Strategy per [THREAT]:\n\n1. Hypothesis: [IPOTESI]\n\n2. Detection queries:\n   - [QUERY_1]\n   - [QUERY_2]\n   \n3. IOCs to search:\n   - [IOC_1]\n   - [IOC_2]\n   \n4. Behavioral indicators:\n   - [COMPORTAMENTO_1]\n   - [COMPORTAMENTO_2]\n\n5. Tools: [TOOLS]",
+    "metadata": {
+      "threat": "[THREAT]",
+      "mitre_technique": "[T1234]"
+    }
+  }
+]

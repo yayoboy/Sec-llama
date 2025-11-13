@@ -369,6 +369,7 @@ docker-compose up -d
 ## 📖 Documentazione
 
 - **[Guida Live USB](docs/LIVE_USB_GUIDE.md)** 🆕 - Setup su distribuzioni live con persistenza
+- **[Guida Dataset](docs/DATASETS_GUIDE.md)** 🆕 - Come ottenere e creare dataset per training
 - **[Features Complete](docs/FEATURES.md)** - Lista completa 90+ funzionalità
 - **[Training Guide](docs/TRAINING.md)** - Sistema training e fine-tuning LLM
 - **[Quick Start](docs/QUICK_START.md)** - Guida rapida per iniziare
