@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # Sec-Llama MCP Server
+  sec-llama-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: sec-llama-mcp-server
+    ports:
+      - "8765:8765"    # MCP HTTP/SSE port
+    environment:
+      # Ollama configuration
+      - OLLAMA_HOST=http://ollama:11434
+
+      # API Keys (CHANGE THESE IN PRODUCTION!)
+      - MCP_API_KEYS=${MCP_API_KEYS:-}
+
+      # Optional: Custom configuration
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8765
+
+    volumes:
+      # Configuration (read-only)
+      - ./config:/app/config:ro
+
+      # Persistent data
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+      - ./database:/app/database
+
+      # Optional: Custom datasets
+      - ./examples/datasets:/app/examples/datasets:ro
+
+    networks:
+      - sec-llama-network
+
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Ollama LLM Server
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sec-llama-ollama
+    ports:
+      - "11434:11434"  # Ollama API port
+    volumes:
+      # Persistent model storage
+      - ollama-models:/root/.ollama
+
+    networks:
+      - sec-llama-network
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    # Optional: GPU support (uncomment if you have NVIDIA GPU)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+networks:
+  sec-llama-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  ollama-models:
+    name: sec-llama-ollama-models

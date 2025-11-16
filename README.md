@@ -156,6 +156,54 @@ sudo ./scripts/external_models_storage.sh sdc1
 
 📚 **[Guida Completa Live USB](docs/LIVE_USB_GUIDE.md)** - Setup, backup, troubleshooting
 
+### MCP Server 🔌 🆕
+
+**Usa Sec-Llama come server MCP** per integrarlo con Claude Desktop o deployment LAN!
+
+#### Uso Locale (Claude Desktop)
+
+```bash
+# Setup automatico
+./scripts/install_mcp_client.sh
+
+# Riavvia Claude Desktop
+# Troverai "sec-llama" tra gli strumenti disponibili!
+```
+
+#### Deployment LAN (HTTP/SSE)
+
+```bash
+# Genera API key
+export MCP_API_KEYS=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+
+# Avvia server HTTP
+MCP_API_KEYS="$MCP_API_KEYS" ./scripts/start_mcp_server.sh http
+
+# Access from: http://your-ip:8765
+```
+
+#### Docker Deployment
+
+```bash
+# Start MCP server + Ollama
+docker-compose -f docker-compose.mcp.yml up -d
+
+# Pull model
+docker-compose -f docker-compose.mcp.yml exec ollama ollama pull llama3.1:8b
+
+# Check health
+curl http://localhost:8765/health
+```
+
+**Funzionalità MCP:**
+- ✅ **8+ Security Tools** esposti via MCP
+- ✅ **Dual Transport**: stdio (local) + HTTP/SSE (LAN)
+- ✅ **API Key Auth** per accesso sicuro
+- ✅ **Rate Limiting** e audit logging
+- ✅ **Docker ready** per deployment facile
+
+📚 **[Guida Completa MCP Server](docs/MCP_SERVER_GUIDE.md)** - Setup, configurazione, API reference
+
 ### Configurazione
 ```bash
 # Copia configurazione di esempio
@@ -368,6 +416,7 @@ docker-compose up -d
 
 ## 📖 Documentazione
 
+- **[Guida MCP Server](docs/MCP_SERVER_GUIDE.md)** 🆕 - Server MCP per Claude Desktop e LAN
 - **[Guida Live USB](docs/LIVE_USB_GUIDE.md)** 🆕 - Setup su distribuzioni live con persistenza
 - **[Guida Dataset](docs/DATASETS_GUIDE.md)** 🆕 - Come ottenere e creare dataset per training
 - **[Features Complete](docs/FEATURES.md)** - Lista completa 90+ funzionalità
