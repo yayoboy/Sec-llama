@@ -1,193 +1,122 @@
 # 🛡️ Sec-Llama - Local LLM Security Suite
 
-**Complete cybersecurity testing platform powered by local LLMs with multiple deployment options**
+**Complete cybersecurity testing platform powered by local LLMs for LAN deployment**
 
 Una suite completa per security testing, vulnerability assessment, e AI-powered security analysis. **100% locale e privato.**
 
 ---
 
-## 🎯 Choose Your Implementation
+## 🎯 Overview
 
-Sec-Llama offre **7 implementazioni indipendenti** per diversi use case. Scegli quella più adatta alle tue esigenze:
+Sec-Llama è una piattaforma unificata di cybersecurity testing che combina:
 
-| Implementation | Best For | Setup Time | Requirements |
-|---------------|----------|------------|--------------|
-| **[Standalone](#-standalone)** | Quick local use, CLI tools | 2 min | Python 3.8+ |
-| **[MCP stdio](#-mcp-stdio)** | Claude Desktop integration | 5 min | Python 3.8+, Claude Desktop |
-| **[MCP HTTP](#-mcp-http)** | Remote access, LAN deployment | 5 min | Python 3.8+ |
-| **[Web UI Full](#-web-ui-full)** | Complete web interface + AI config | 10 min | Python 3.8+, Node.js |
-| **[Docker Dev](#-docker-dev)** | Development environment | 5 min | Docker |
-| **[Docker Production](#-docker-production)** | Production deployment, scaling | 15 min | Docker Swarm |
-| **[Live USB](#-live-usb)** | Portable, boot from USB | 20 min | USB 32GB+ |
+- ✅ **LLM Remoto**: Ollama o LM Studio su PC dedicato
+- ✅ **Docker Deployment**: Container orchestration con Docker Compose o Portainer
+- ✅ **Web UI Completa**: Gestione e configurazione via interfaccia web
+- ✅ **LAN Optimized**: Progettato per deployment su rete locale
+- ✅ **Production Ready**: PostgreSQL, Redis, health checks
 
 ---
 
-## 🚀 Quick Start by Implementation
+## 🚀 Quick Start
 
-### 📦 Standalone
+### Prerequisiti
 
-**Perfect for:** Quick local use, command-line security testing
+- **Docker** 20.10+ e **Docker Compose** 2.0+
+- **LLM Server** (Ollama o LM Studio) su un altro PC della LAN
+- **Rete LAN** con connettività tra i server
 
+### Setup LLM Server (su PC separato)
+
+**Opzione 1: Ollama** (Consigliato)
 ```bash
-cd implementations/standalone
-./setup.sh
-./sec-llama.sh scan network 192.168.1.0/24
-./sec-llama.sh threat cve CVE-2024-1234
+# Installa Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Scarica un modello
+ollama pull llama3.1:8b
+
+# Avvia con accesso rete
+OLLAMA_HOST=0.0.0.0:11434 ollama serve
 ```
 
-**Features:**
-- ✅ CLI tool for immediate use
-- ✅ All security modules
-- ✅ Local Ollama integration
-- ✅ Report generation
+**Opzione 2: LM Studio**
+1. Scarica da [https://lmstudio.ai/](https://lmstudio.ai/)
+2. Carica un modello
+3. Settings → Server → Host: `0.0.0.0`, Port: `1234`
+4. Start Server
 
-📚 **[Standalone Guide](implementations/standalone/README.md)**
-
----
-
-### 🔌 MCP stdio
-
-**Perfect for:** Using Sec-Llama tools inside Claude Desktop
+### Deploy Sec-Llama
 
 ```bash
-cd implementations/mcp-stdio
-./setup.sh
-./start.sh
-# Restart Claude Desktop - tools will appear automatically
-```
+# 1. Vai alla directory
+cd implementations/lan-server
 
-**Features:**
-- ✅ 8+ security tools in Claude Desktop
-- ✅ stdio transport (local only)
-- ✅ Zero configuration
-- ✅ Automatic tool discovery
+# 2. Configura environment
+cp .env.example .env
+nano .env
 
-📚 **[MCP stdio Guide](implementations/mcp-stdio/README.md)**
+# IMPORTANTE: Modifica questi valori
+# - LLM_PROVIDER=ollama
+# - OLLAMA_HOST=http://192.168.1.100:11434
+# - SECRET_KEY=<genera-stringa-random-32-char>
+# - POSTGRES_PASSWORD=<password-sicura>
+# - REDIS_PASSWORD=<password-sicura>
 
----
-
-### 🌐 MCP HTTP
-
-**Perfect for:** Remote access, team collaboration, LAN deployment
-
-```bash
-cd implementations/mcp-http
-./setup.sh
-./start.sh
-# Access from: http://localhost:8765
-```
-
-**Features:**
-- ✅ HTTP/SSE transport
-- ✅ API key authentication
-- ✅ Rate limiting
-- ✅ Multi-client support
-- ✅ Audit logging
-
-📚 **[MCP HTTP Guide](implementations/mcp-http/README.md)**
-
----
-
-### 🎨 Web UI Full
-
-**Perfect for:** Complete web interface with AI configuration
-
-```bash
-cd implementations/web-ui-full
-./setup.sh
-./start.sh
-# Open: http://localhost:8080
-```
-
-**Features:**
-- ✅ **AI Configuration UI** - Configure local/remote Ollama
-- ✅ **Model Management** - Pull, delete, test models
-- ✅ **Dashboard** - Real-time statistics
-- ✅ **Tools Execution** - Web-based security tools
-- ✅ **API Keys Management** - Generate and manage keys
-- ✅ **Audit Logs** - Complete activity tracking
-- ✅ **Report Export** - PDF/HTML/JSON
-
-📚 **[Web UI Full Guide](implementations/web-ui-full/README.md)**
-
----
-
-### 🐳 Docker Dev
-
-**Perfect for:** Development environment with all services
-
-```bash
-cd implementations/docker-dev
+# 3. Avvia con Docker Compose
 docker-compose up -d
-# Access: http://localhost:8080
+
+# 4. Verifica stato
+docker-compose ps
+docker-compose logs -f web-ui
+
+# 5. Accedi alla Web UI
+# Browser: http://localhost:8080
 ```
 
-**Features:**
-- ✅ Complete dev environment
-- ✅ Hot reload
-- ✅ PostgreSQL + Redis
-- ✅ Ollama container
-- ✅ Easy debugging
-
-📚 **[Docker Dev Guide](implementations/docker-dev/README.md)**
+**Guida completa**: Vedi [implementations/lan-server/QUICK_START.md](implementations/lan-server/QUICK_START.md)
 
 ---
 
-### 🏭 Docker Production
+## 🏗️ Architettura
 
-**Perfect for:** Production deployment, high availability, scaling
-
-```bash
-cd implementations/docker-production
-./install.sh
-# Stack deployed with auto-scaling
+```
+┌─────────────────────────────────────────────────────────┐
+│                    LAN Network                          │
+│                                                         │
+│  ┌──────────────┐     ┌──────────────┐                │
+│  │ LLM Server   │     │ Sec-Llama    │                │
+│  │              │     │ Server       │                │
+│  │ • Ollama     │────▶│ • Web UI     │                │
+│  │   OR         │     │ • PostgreSQL │                │
+│  │ • LM Studio  │     │ • Redis      │                │
+│  │              │     │ • Modules    │                │
+│  └──────────────┘     └──────────────┘                │
+│  192.168.1.100        192.168.1.10                     │
+│  :11434 / :1234       :8080                            │
+│                                                         │
+│  ┌──────────────────────────────────┐                 │
+│  │   Client Browsers                │                 │
+│  │   http://192.168.1.10:8080       │                 │
+│  └──────────────────────────────────┘                 │
+└─────────────────────────────────────────────────────────┘
 ```
 
-**Features:**
-- ✅ **Docker Stack** - Swarm orchestration
-- ✅ **Auto-scaling** - Scale services on demand
-- ✅ **Secrets Management** - Secure credentials
-- ✅ **Health Checks** - Automatic recovery
-- ✅ **Nginx Reverse Proxy** - HTTPS, rate limiting
-- ✅ **Automatic Backups** - Scheduled database backups
-- ✅ **High Availability** - Multi-node support
-
-📚 **[Docker Production Guide](implementations/docker-production/README.md)**
-
----
-
-### 💿 Live USB
-
-**Perfect for:** Portable security testing, boot from USB
-
-```bash
-cd implementations/live-usb
-sudo ./create-usb.sh /dev/sdX
-# Boot from USB and run Sec-Llama
-```
-
-**Features:**
-- ✅ Bootable USB with persistence
-- ✅ Pre-configured Kali/Parrot
-- ✅ All tools pre-installed
-- ✅ Portable LLM models
-- ✅ External storage support
-
-📚 **[Live USB Guide](implementations/live-usb/README.md)**
+**Componenti**:
+- **LLM Server**: PC dedicato con Ollama o LM Studio
+- **Sec-Llama Server**: Container Docker (Web UI + Database + Cache)
+- **Clients**: Accesso via browser alla porta 8080
 
 ---
 
 ## 🎯 Core Security Features
 
-All implementations include these core capabilities:
-
 ### 🌐 Network Security
 - Network discovery (ARP/ICMP/TCP)
 - Smart port scanning (Nmap integration)
 - Service analysis + CVE lookup
-- Wireless security (WiFi/Bluetooth/IoT)
+- Wireless security (WiFi/Bluetooth)
 - Traffic analysis (PCAP parsing)
-- MITM testing
 - Attack planning
 
 ### 💻 Application Security
@@ -209,13 +138,6 @@ All implementations include these core capabilities:
 - BloodHound
 - Trivy
 - Nmap/Masscan
-
-### 🤖 Multi-Agent System
-- Recon Agent
-- Exploit Agent
-- Defense Agent
-- Coordinator
-- Inter-agent communication
 
 ### 🔍 Threat Intelligence
 - CVE lookup (NVD API)
@@ -245,53 +167,120 @@ All implementations include these core capabilities:
 - Model training (Ollama, LoRA/QLoRA)
 - Model evaluation
 - Custom datasets
-- Progressive training
-
----
-
-## 📋 Prerequisites
-
-### Common Requirements
-- **Python 3.8+** (for Python-based implementations)
-- **Ollama** (for AI features)
-
-### Optional Requirements
-- **Docker** (for Docker implementations)
-- **Node.js** (for Web UI)
-- **Claude Desktop** (for MCP stdio)
-
-### Install Ollama
-```bash
-# Install Ollama
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Pull a model
-ollama pull llama3.1:8b
-
-# For more complex analysis
-ollama pull llama3.1:70b
-```
 
 ---
 
 ## 📚 Documentation
 
-### Implementation Guides
-- **[Standalone](implementations/standalone/README.md)** - CLI tool for local use
-- **[MCP stdio](implementations/mcp-stdio/README.md)** - Claude Desktop integration
-- **[MCP HTTP](implementations/mcp-http/README.md)** - Remote MCP server
-- **[Web UI Full](implementations/web-ui-full/README.md)** - Complete web interface
-- **[Docker Dev](implementations/docker-dev/README.md)** - Development environment
-- **[Docker Production](implementations/docker-production/README.md)** - Production deployment
-- **[Live USB](implementations/live-usb/README.md)** - Bootable USB
+### Getting Started
+- **[Quick Start Guide](implementations/lan-server/QUICK_START.md)** - Start in 5 minutes
+- **[Complete Documentation](implementations/lan-server/README.md)** - Full implementation guide
+- **[Configuration Guide](implementations/lan-server/.env.example)** - Environment variables
 
-### General Documentation
-- **[Features Complete](docs/FEATURES.md)** - Complete feature list
-- **[Quick Start IT](docs/QUICK_START_IT.md)** - Quick start guide (Italian)
-- **[Navigation Guide](docs/NAVIGATION.md)** - Navigate the new structure
-- **[API Reference](docs/api.md)** - API documentation
-- **[Training Guide](docs/TRAINING.md)** - LLM training system
-- **[Contributing](docs/contributing.md)** - How to contribute
+### Deployment Options
+- **Docker Compose**: Development and production
+- **Portainer**: Stack deployment with UI
+- **Manual Setup**: Local development without Docker
+
+---
+
+## 🔧 Configuration
+
+### LLM Configuration
+
+**Supporta due provider**:
+
+1. **Ollama** (Native API)
+   - Host: `http://192.168.1.100:11434`
+   - Models: llama3.1:8b, llama3.1:70b, mistral, codellama
+
+2. **LM Studio** (OpenAI-compatible API)
+   - Host: `http://192.168.1.100:1234`
+   - Qualsiasi modello compatibile
+
+**Configurazione via**:
+- File `.env` per Docker
+- Web UI → AI Configuration
+- File YAML (opzionale)
+
+### Database & Caching
+
+- **PostgreSQL 15**: Database principale
+- **Redis 7**: Caching e session storage
+- **Backup automatici**: Configurabili
+- **Persistenza**: Volumes Docker
+
+---
+
+## 📊 Example Commands
+
+Dalla Web UI puoi eseguire:
+
+### Network Security
+```bash
+# Host Discovery
+POST /api/tools/network/discover
+{ "network": "192.168.1.0/24" }
+
+# Port Scanning with AI
+POST /api/tools/network/scan
+{ "host": "192.168.1.10", "ai_analysis": true }
+```
+
+### Threat Intelligence
+```bash
+# CVE Lookup
+POST /api/tools/threat/cve
+{ "cve_id": "CVE-2024-1234" }
+
+# IOC Analysis
+POST /api/tools/threat/ioc
+{ "ioc": "192.168.1.100", "type": "ip" }
+```
+
+### Code Security
+```bash
+# SAST Scan
+POST /api/tools/code/scan
+{ "path": "./myapp", "language": "python" }
+
+# Container Scan
+POST /api/tools/container/scan
+{ "image": "nginx:latest" }
+```
+
+---
+
+## 🐳 Docker Management
+
+### Basic Commands
+
+```bash
+# Start services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Restart
+docker-compose restart
+
+# Update images
+docker-compose pull
+docker-compose up -d
+```
+
+### Portainer Deployment
+
+1. Access Portainer UI: `http://your-portainer:9000`
+2. Go to: **Stacks** → **Add Stack**
+3. Name: `sec-llama`
+4. Upload: `implementations/lan-server/portainer-stack.yml`
+5. Add environment variables from: `portainer-env.txt`
+6. **Deploy**
 
 ---
 
@@ -299,192 +288,209 @@ ollama pull llama3.1:70b
 
 ```
 Sec-llama/
-├── implementations/           # 7 independent implementations
-│   ├── standalone/           # CLI tool
-│   ├── mcp-stdio/           # MCP for Claude Desktop
-│   ├── mcp-http/            # MCP remote server
-│   ├── web-ui-full/         # Complete Web UI
-│   ├── docker-dev/          # Development environment
-│   ├── docker-production/   # Production stack
-│   └── live-usb/            # Bootable USB
+├── implementations/
+│   └── lan-server/              # Unified implementation
+│       ├── docker-compose.yml   # Docker Compose config
+│       ├── Dockerfile           # Web UI container
+│       ├── .env.example         # Environment template
+│       ├── portainer-stack.yml  # Portainer stack
+│       ├── requirements.txt     # Python dependencies
+│       ├── setup.sh             # Setup script
+│       ├── README.md            # Full documentation
+│       ├── QUICK_START.md       # Quick start guide
+│       │
+│       ├── core/                # Core modules
+│       │   ├── config.py        # Configuration
+│       │   ├── llm_interface.py # LLM integration
+│       │   └── prompt_templates.py
+│       │
+│       ├── modules/             # Security modules
+│       │   ├── network/
+│       │   ├── threat_intel/
+│       │   ├── code_review/
+│       │   ├── vuln_scanner/
+│       │   ├── container_security/
+│       │   ├── api_security/
+│       │   ├── log_analyzer/
+│       │   ├── incident_response/
+│       │   ├── pentest_assistant/
+│       │   ├── training/
+│       │   └── reporting/
+│       │
+│       ├── web_ui/              # Web interface
+│       │   ├── backend/         # FastAPI
+│       │   └── frontend/        # Vue.js
+│       │
+│       └── config/              # Config files
 │
-├── shared/                   # Shared libraries
-│   ├── core/                # Core security modules
-│   ├── ai/                  # AI/LLM integration
-│   └── utils/               # Common utilities
-│
-└── docs/                     # Documentation
-```
-
-**Note:** Each implementation is completely independent and self-contained. You can use one or multiple implementations based on your needs.
-
----
-
-## 🔧 Configuration
-
-### Remote Ollama Setup
-
-If you want to use Ollama on a different machine:
-
-**On the Ollama server:**
-```bash
-export OLLAMA_HOST=0.0.0.0:11434
-ollama serve
-```
-
-**In Sec-Llama:**
-
-For Web UI implementations:
-1. Open Web UI → AI Configuration
-2. Set host: `http://SERVER_IP:11434`
-3. Test connection
-4. Save
-
-For other implementations, edit `config.yaml`:
-```yaml
-ollama:
-  host: http://SERVER_IP:11434
-  timeout: 120
-  enabled: true
+├── docs/                        # Documentation
+├── examples/                    # Examples (optional)
+└── README.md                    # This file
 ```
 
 ---
 
-## 🐳 Docker Quick Reference
+## 🔒 Security Best Practices
 
-### Docker Dev
-```bash
-cd implementations/docker-dev
-docker-compose up -d
-docker-compose logs -f
-docker-compose down
-```
+### Before Production
 
-### Docker Production (Stack)
+- [ ] Cambia **tutte** le password di default in `.env`
+- [ ] Genera `SECRET_KEY` e `JWT_SECRET_KEY` sicuri (32+ caratteri)
+- [ ] Configura firewall per limitare accesso
+- [ ] Configura HTTPS con reverse proxy (Nginx/Traefik)
+- [ ] Imposta `ALLOWED_ORIGINS` a domini specifici (non `*`)
+- [ ] Abilita rate limiting
+- [ ] Configura backup automatici database
+- [ ] Rivedi permessi moduli di sicurezza
+
+### Firewall Rules
+
 ```bash
-cd implementations/docker-production
-./install.sh                                    # Install
-docker stack services sec-llama                 # Check services
-docker service logs -f sec-llama_web-ui        # View logs
-docker service scale sec-llama_web-ui=3        # Scale
-docker stack rm sec-llama                      # Remove
+# Sul server LLM (Ollama)
+sudo ufw allow 11434/tcp
+
+# Sul server LLM (LM Studio)
+sudo ufw allow 1234/tcp
+
+# Sul server Sec-Llama
+sudo ufw allow 8080/tcp  # Web UI
+sudo ufw allow 5432/tcp  # PostgreSQL (solo se accesso esterno necessario)
+sudo ufw allow 6379/tcp  # Redis (solo se accesso esterno necessario)
 ```
 
 ---
 
-## 📊 Example Commands
+## 🐛 Troubleshooting
 
-### Network Security
+### Cannot connect to LLM server
+
 ```bash
-# Discover hosts
-./sec-llama.sh scan network 192.168.1.0/24
+# Test connettività
+ping 192.168.1.100
 
-# AI-powered port scanning
-./sec-llama.sh scan ports --host 192.168.1.10 --ai-suggest
+# Test API Ollama
+curl http://192.168.1.100:11434/api/tags
 
-# Vulnerability assessment
-./sec-llama.sh scan vuln --network 192.168.1.0/24
+# Test API LM Studio
+curl http://192.168.1.100:1234/v1/models
 
-# Analyze network traffic
-./sec-llama.sh analyze traffic --pcap capture.pcap
+# Verifica firewall
+sudo ufw status
 ```
 
-### Application Security
+### Web UI not accessible
+
 ```bash
-# SAST code scanning
-./sec-llama.sh scan code --path ./myapp --language python
+# Verifica container
+docker-compose ps
 
-# Container security
-./sec-llama.sh scan container --image nginx:latest
+# Verifica logs
+docker-compose logs web-ui
 
-# API fuzzing
-./sec-llama.sh fuzz api --url https://api.example.com
+# Verifica porta
+netstat -tlnp | grep 8080
 ```
 
-### Threat Intelligence
+### Database errors
+
 ```bash
-# CVE lookup
-./sec-llama.sh threat cve CVE-2024-1234
+# Logs PostgreSQL
+docker-compose logs postgres
 
-# IOC analysis
-./sec-llama.sh threat ioc 192.168.1.100
-
-# Search CVEs
-./sec-llama.sh threat search --keyword "apache"
+# Test connessione
+docker exec -it sec-llama-postgres psql -U sec_llama -d sec_llama
 ```
 
-### LLM Training
-```bash
-# Collect training data
-./sec-llama.sh train collect --type cve --max 10000
+---
 
-# Fine-tune model
-./sec-llama.sh train finetune \
-  --base llama3.1:8b \
-  --dataset training_data.json \
-  --name sec-llama-8b
+## 📊 Performance
 
-# Evaluate model
-./sec-llama.sh train evaluate --model sec-llama-8b
-```
+### Resource Requirements
+
+**Minimo**:
+- CPU: 2 cores
+- RAM: 4 GB
+- Disk: 20 GB
+- Network: 100 Mbps
+
+**Raccomandato**:
+- CPU: 4+ cores
+- RAM: 8+ GB
+- Disk: 50+ GB SSD
+- Network: 1 Gbps
+
+**LLM Server** (separato):
+- Dipende dal modello
+- llama3.1:8b → 8 GB RAM
+- llama3.1:70b → 64 GB RAM
 
 ---
 
 ## ⚖️ Legal & Ethics
 
-**IMPORTANT:** This tool is intended ONLY for:
-- ✅ Authorized security testing
-- ✅ CTF competitions
-- ✅ Security research
-- ✅ Personal test/lab environments
-- ✅ Educational purposes
+**IMPORTANTE:** Questo tool è destinato SOLO a:
+- ✅ Security testing autorizzato
+- ✅ Competizioni CTF
+- ✅ Ricerca sulla sicurezza
+- ✅ Ambienti personali di test/lab
+- ✅ Scopi educativi
 
-**DO NOT use for:**
-- ❌ Unauthorized access to systems
-- ❌ Illegal activities
-- ❌ Testing without explicit permission
+**NON usare per:**
+- ❌ Accesso non autorizzato a sistemi
+- ❌ Attività illegali
+- ❌ Testing senza permesso esplicito
 
-Users are responsible for appropriate use of this software.
+Gli utenti sono responsabili dell'uso appropriato di questo software.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
+Contributi benvenuti!
+
+1. Fork del repository
+2. Crea feature branch
+3. Commit delle modifiche
+4. Push al branch
+5. Apri Pull Request
 
 ---
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE)
+MIT License - vedi file LICENSE
 
 ---
 
 ## 🙏 Credits
 
 - **Ollama**: Local LLM runtime
+- **LM Studio**: Local LLM interface
 - **FastAPI**: Modern web framework
 - **Vue.js**: Progressive JavaScript framework
-- **Nmap**: Network scanning
+- **PostgreSQL**: Reliable database
+- **Redis**: Fast caching
 - **Docker**: Containerization
+- **Nmap**: Network scanning
 - Community open source security tools
 
 ---
 
 ## 📞 Support
 
+- **Documentation**: Vedi cartella `implementations/lan-server/`
 - **Issues**: [GitHub Issues](https://github.com/yourusername/Sec-llama/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/Sec-llama/discussions)
-- **Documentation**: [docs/](docs/)
+- **Quick Start**: [QUICK_START.md](implementations/lan-server/QUICK_START.md)
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Next Steps
 
-1. **Choose an implementation** from the table above
-2. **Follow the Quick Start** for that implementation
-3. **Configure Ollama** (local or remote)
-4. **Start testing!**
+1. **Deploy**: Segui la [Quick Start Guide](implementations/lan-server/QUICK_START.md)
+2. **Configure**: Imposta il tuo LLM server remoto
+3. **Explore**: Prova i vari moduli di sicurezza
+4. **Secure**: Applica le security best practices
+5. **Scale**: Configura backup e monitoring
 
 ---
 

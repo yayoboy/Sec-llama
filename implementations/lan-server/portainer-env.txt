@@ -1,0 +1,53 @@
+# ============================================================================
+# Portainer Environment Variables
+# ============================================================================
+# Copy these variables into Portainer when deploying the stack:
+# 1. Go to Portainer → Stacks → Add Stack
+# 2. Paste portainer-stack.yml content
+# 3. Scroll down to "Environment variables"
+# 4. Add these variables (one per line or use advanced editor)
+# ============================================================================
+
+# Image Configuration
+IMAGE_TAG=latest
+# DOCKER_REGISTRY=your-registry.com/
+
+# Web UI
+WEB_UI_PORT=8080
+LOG_LEVEL=INFO
+
+# Security Keys (REQUIRED - CHANGE THESE!)
+SECRET_KEY=CHANGE-THIS-SECRET-KEY-MIN-32-CHARS-RANDOM-STRING
+JWT_SECRET_KEY=CHANGE-THIS-JWT-SECRET-KEY-MIN-32-CHARS-RANDOM
+POSTGRES_PASSWORD=CHANGE-THIS-SECURE-DATABASE-PASSWORD
+REDIS_PASSWORD=CHANGE-THIS-SECURE-REDIS-PASSWORD
+
+# LLM Provider ('ollama' or 'lm-studio')
+LLM_PROVIDER=ollama
+
+# Ollama Configuration (Remote Server)
+OLLAMA_HOST=http://192.168.1.100:11434
+OLLAMA_MODEL=llama3.1:8b
+OLLAMA_TIMEOUT=120
+
+# LM Studio Configuration (Alternative)
+LM_STUDIO_HOST=http://192.168.1.100:1234
+LM_STUDIO_MODEL=local-model
+LM_STUDIO_API_KEY=not-needed
+
+# CORS
+ALLOWED_ORIGINS=*
+
+# Rate Limiting
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_REQUESTS=100
+RATE_LIMIT_WINDOW=60
+
+# ============================================================================
+# IMPORTANT NOTES:
+# ============================================================================
+# 1. CHANGE ALL PASSWORDS AND SECRETS!
+# 2. Set OLLAMA_HOST to your actual Ollama server IP
+# 3. For production, set ALLOWED_ORIGINS to specific domains
+# 4. The stack will create persistent volumes automatically
+# ============================================================================

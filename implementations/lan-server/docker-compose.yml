@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: sec-llama-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sec_llama}
+      POSTGRES_USER: ${POSTGRES_USER:-sec_llama}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sec-llama-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sec_llama}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: sec-llama-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-secllama}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sec-llama-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Web UI Application
+  web-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sec-llama-web-ui
+    environment:
+      # Database
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sec_llama}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-sec_llama}
+
+      # Redis
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-secllama}@redis:6379/0
+
+      # Remote LLM Configuration (Ollama or LM Studio)
+      - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
+      - OLLAMA_HOST=${OLLAMA_HOST:-http://192.168.1.100:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.1:8b}
+      - OLLAMA_TIMEOUT=${OLLAMA_TIMEOUT:-120}
+
+      # LM Studio Configuration (OpenAI-compatible API)
+      - LM_STUDIO_HOST=${LM_STUDIO_HOST:-http://192.168.1.100:1234}
+      - LM_STUDIO_MODEL=${LM_STUDIO_MODEL:-local-model}
+      - LM_STUDIO_API_KEY=${LM_STUDIO_API_KEY:-not-needed}
+
+      # Application Settings
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - WEB_UI_PORT=8080
+
+      # CORS Settings
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+
+      # Rate Limiting
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true}
+      - RATE_LIMIT_REQUESTS=${RATE_LIMIT_REQUESTS:-100}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-60}
+
+    ports:
+      - "${WEB_UI_PORT:-8080}:8080"
+    volumes:
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+      - ./database:/app/database
+      - ./config:/app/config:ro
+    networks:
+      - sec-llama-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  sec-llama-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

@@ -1,0 +1,160 @@
+# ============================================================================
+# Sec-Llama LAN Server - Configuration Example
+# ============================================================================
+# This file shows available configuration options
+# For production, use environment variables (.env file) instead
+# ============================================================================
+
+# LLM Configuration
+llm:
+  provider: "ollama"  # ollama or lm-studio
+
+  # Ollama settings
+  ollama:
+    host: "http://192.168.1.100:11434"
+    model: "llama3.1:8b"
+    timeout: 120
+
+  # LM Studio settings (OpenAI-compatible)
+  lm_studio:
+    host: "http://192.168.1.100:1234"
+    model: "local-model"
+    api_key: "not-needed"
+
+# Database Configuration
+database:
+  type: "postgresql"
+  host: "localhost"
+  port: 5432
+  name: "sec_llama"
+  user: "sec_llama"
+  password: "CHANGE-THIS-PASSWORD"
+
+# Redis Configuration
+redis:
+  host: "localhost"
+  port: 6379
+  password: "CHANGE-THIS-PASSWORD"
+  db: 0
+
+# Application Settings
+application:
+  host: "0.0.0.0"
+  port: 8080
+  debug: false
+  log_level: "INFO"
+  secret_key: "CHANGE-THIS-SECRET-KEY"
+  jwt_secret_key: "CHANGE-THIS-JWT-SECRET"
+
+# Security Settings
+security:
+  # CORS
+  allowed_origins:
+    - "*"  # Change to specific domains in production
+
+  # Rate Limiting
+  rate_limit:
+    enabled: true
+    requests: 100
+    window: 60  # seconds
+
+  # Session
+  session_timeout: 3600  # seconds
+
+  # Password Requirements
+  password:
+    min_length: 12
+    require_special: true
+    require_number: true
+    require_uppercase: true
+
+# Network Settings
+network:
+  max_concurrent_scans: 3
+  default_timeout: 30
+  stealth_mode: false
+
+# Scanning Tools
+scanning:
+  nmap:
+    path: "/usr/bin/nmap"
+    default_args: "-sV -sC --open"
+
+  masscan:
+    enabled: false
+    path: "/usr/bin/masscan"
+    rate: 1000
+
+# Threat Intelligence
+threat_intel:
+  # NVD API (no key required)
+  nvd:
+    enabled: true
+    update_interval: 86400  # 24 hours
+
+  # External APIs (optional)
+  apis:
+    shodan:
+      enabled: false
+      api_key: ""
+
+    virustotal:
+      enabled: false
+      api_key: ""
+
+    censys:
+      enabled: false
+      api_key: ""
+
+# Reporting
+reporting:
+  output_dir: "./reports"
+  formats:
+    - "pdf"
+    - "html"
+    - "json"
+  retention_days: 90
+  include_screenshots: true
+
+# Logging
+logging:
+  level: "INFO"
+  file: "./logs/sec-llama.log"
+  rotation: "10 MB"
+  retention: 10  # number of files
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Backup
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  path: "./backups"
+
+# Performance
+performance:
+  cache:
+    enabled: true
+    ttl: 3600
+
+  worker_processes: 4
+  max_requests: 1000
+  timeout: 300
+
+# Features
+features:
+  # Enable/disable specific modules
+  modules:
+    network_security: true
+    code_security: true
+    threat_intelligence: true
+    incident_response: true
+    api_security: true
+    container_security: true
+    log_analysis: true
+
+  # AI Features
+  ai:
+    enabled: true
+    auto_analysis: true
+    confidence_threshold: 0.7

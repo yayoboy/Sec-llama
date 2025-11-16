@@ -1,0 +1,138 @@
+# ============================================================================
+# Sec-Llama LAN Server - Portainer Stack
+# ============================================================================
+# How to deploy in Portainer:
+# 1. Go to Portainer UI → Stacks → Add Stack
+# 2. Name: sec-llama-lan
+# 3. Copy this content into the Web editor
+# 4. Add environment variables from portainer-env.txt
+# 5. Deploy the stack
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: sec_llama
+      POSTGRES_USER: sec_llama
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sec-llama-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sec_llama"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - sec-llama-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # Web UI Application
+  web-ui:
+    image: ${DOCKER_REGISTRY:-}sec-llama/lan-server:${IMAGE_TAG:-latest}
+    environment:
+      # Database
+      - DATABASE_URL=postgresql://sec_llama:${POSTGRES_PASSWORD}@postgres:5432/sec_llama
+
+      # Redis
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+
+      # Remote LLM Configuration
+      - LLM_PROVIDER=${LLM_PROVIDER}
+      - OLLAMA_HOST=${OLLAMA_HOST}
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+      - OLLAMA_TIMEOUT=${OLLAMA_TIMEOUT}
+      - LM_STUDIO_HOST=${LM_STUDIO_HOST}
+      - LM_STUDIO_MODEL=${LM_STUDIO_MODEL}
+      - LM_STUDIO_API_KEY=${LM_STUDIO_API_KEY}
+
+      # Application Settings
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - DEBUG=false
+      - LOG_LEVEL=${LOG_LEVEL}
+      - WEB_UI_PORT=8080
+
+      # CORS & Rate Limiting
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED}
+      - RATE_LIMIT_REQUESTS=${RATE_LIMIT_REQUESTS}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW}
+
+    ports:
+      - "${WEB_UI_PORT}:8080"
+    volumes:
+      - web_logs:/app/logs
+      - web_reports:/app/reports
+      - web_database:/app/database
+    networks:
+      - sec-llama-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          memory: 512M
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  web_logs:
+    driver: local
+  web_reports:
+    driver: local
+  web_database:
+    driver: local
+
+networks:
+  sec-llama-network:
+    driver: bridge
