@@ -1,0 +1,61 @@
+# ========================================
+# Sec-Llama - Portainer Environment Variables
+# ========================================
+# Copia questo contenuto nella sezione "Environment variables"
+# di Portainer quando crei lo stack
+#
+
+# ===================
+# DATABASE (OBBLIGATORIO)
+# ===================
+POSTGRES_DB=sec_llama
+POSTGRES_USER=sec_llama
+POSTGRES_PASSWORD=CAMBIAMI_PASSWORD_SICURA_123
+POSTGRES_PORT=5432
+
+# ===================
+# REDIS (OBBLIGATORIO)
+# ===================
+REDIS_PASSWORD=CAMBIAMI_REDIS_PASSWORD_456
+REDIS_PORT=6379
+
+# ===================
+# LLM CONFIGURATION (OBBLIGATORIO)
+# ===================
+# Provider: ollama | lm_studio
+LLM_PROVIDER=ollama
+
+# Indirizzo del PC con Ollama (CAMBIARE!)
+OLLAMA_HOST=http://192.168.1.100:11434
+OLLAMA_MODEL=llama3.1:8b
+OLLAMA_TIMEOUT=120
+
+# LM Studio (se usi LM Studio invece di Ollama)
+LM_STUDIO_HOST=http://192.168.1.100:1234
+LM_STUDIO_MODEL=local-model
+LM_STUDIO_API_KEY=not-needed
+
+# ===================
+# SECURITY (OBBLIGATORIO)
+# ===================
+# Genera con: openssl rand -hex 32
+SECRET_KEY=CAMBIAMI_GENERA_CHIAVE_RANDOM_32_CARATTERI
+JWT_SECRET_KEY=CAMBIAMI_GENERA_JWT_KEY_32_CARATTERI
+
+# Admin di default (CAMBIARE!)
+ADMIN_USERNAME=admin
+ADMIN_EMAIL=admin@sec-llama.local
+ADMIN_PASSWORD=ChangeMeOnFirstLogin123!
+
+# ===================
+# APPLICATION (OPZIONALE)
+# ===================
+DEBUG=false
+LOG_LEVEL=INFO
+WEB_UI_PORT=8080
+ALLOWED_ORIGINS=*
+
+# Rate Limiting
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_REQUESTS=100
+RATE_LIMIT_WINDOW=60

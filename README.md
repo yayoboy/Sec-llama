@@ -44,7 +44,8 @@ docker-compose up -d
 ### 📚 Guide Dettagliate
 
 - **⚡ Deploy Rapido**: [QUICK_START.md](QUICK_START.md) - Setup completo in 5 minuti
-- **🔧 Deploy Avanzato**: [implementations/lan-server/DEPLOY_GUIDE.md](implementations/lan-server/DEPLOY_GUIDE.md) - Configurazione production con Portainer
+- **🐳 Deploy Portainer**: [PORTAINER_DEPLOY.md](PORTAINER_DEPLOY.md) - Deploy con Portainer (GUI) in 3 click
+- **🔧 Deploy Avanzato**: [DEPLOYMENT.md](DEPLOYMENT.md) - Configurazione production completa
 - **📖 Features Complete**: [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Tutte le funzionalità disponibili
 
 ---
