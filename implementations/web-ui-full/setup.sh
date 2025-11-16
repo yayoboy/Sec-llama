@@ -24,17 +24,16 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Link shared libraries
-ln -sf ../../shared ./shared
-
 # Frontend setup
 echo "📦 Setting up frontend..."
-cd frontend
-npm install
-cd ..
+if [ -d "web_ui/frontend" ]; then
+    cd web_ui/frontend
+    npm install
+    cd ../..
+fi
 
 # Create directories
-mkdir -p logs reports database
+mkdir -p logs reports database static
 
 # Create .env if not exists
 if [ ! -f ".env" ]; then

@@ -20,13 +20,10 @@ source venv/bin/activate
 # Install dependencies
 echo "📦 Installing dependencies..."
 pip install -r requirements.txt
-
-# Link shared libraries
-echo "📦 Linking shared libraries..."
-ln -sf ../../shared ./shared
+pip install -r requirements-mcp.txt
 
 # Create directories
-mkdir -p logs config
+mkdir -p logs config database reports
 
 # Copy default config
 if [ ! -f "config.yaml" ]; then

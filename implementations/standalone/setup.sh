@@ -21,12 +21,8 @@ source venv/bin/activate
 echo "📦 Installing dependencies..."
 pip install -r requirements.txt
 
-# Copy shared libraries
-echo "📦 Linking shared libraries..."
-ln -sf ../../shared ./shared
-
 # Create directories
-mkdir -p reports config
+mkdir -p reports logs database
 
 # Copy default config
 if [ ! -f "config.yaml" ]; then
