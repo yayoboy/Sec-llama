@@ -105,39 +105,146 @@ class ToolExecutor:
         parameters: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
-        Call MCP tool
+        Call MCP tool - Execute real security modules
 
-        This would integrate with the actual MCP server.
-        For now, simulates execution.
+        Integrates with actual security scanning modules
         """
-        # TODO: Integrate with actual MCP server
-        # For now, simulate with delay
-        await asyncio.sleep(0.5)
+        try:
+            if tool_name == "network_discover":
+                # Real network discovery
+                subnet = parameters.get("subnet", "192.168.1.0/24")
+                method = parameters.get("method", "arp")
 
-        # Simulate result based on tool
-        if tool_name == "network_discover":
+                discovery = HostDiscovery()
+                hosts = await asyncio.to_thread(
+                    discovery.discover_network, subnet, method
+                )
+
+                return {
+                    "summary": {
+                        "total_hosts": len(hosts),
+                        "subnet": subnet,
+                        "method": method
+                    },
+                    "hosts": [
+                        {
+                            "ip": h.ip,
+                            "mac": h.mac,
+                            "hostname": h.hostname,
+                            "is_alive": h.is_alive,
+                            "open_ports": h.open_ports
+                        }
+                        for h in hosts
+                    ]
+                }
+
+            elif tool_name == "network_scan":
+                # Real port scanning
+                host = parameters.get("host")
+                ports = parameters.get("ports")
+                profile = parameters.get("profile", "standard")
+
+                if not host:
+                    raise ValueError("Host parameter is required")
+
+                scanner = PortScanner()
+                result = await asyncio.to_thread(
+                    scanner.scan, host, ports, profile
+                )
+
+                return {
+                    "host": result.host,
+                    "hostname": result.hostname,
+                    "state": result.state,
+                    "os_guess": result.os_guess,
+                    "open_ports": len(result.services),
+                    "services": [
+                        {
+                            "port": s.port,
+                            "protocol": s.protocol,
+                            "service": s.service,
+                            "version": s.version,
+                            "product": s.product
+                        }
+                        for s in result.services
+                    ]
+                }
+
+            elif tool_name == "code_scan":
+                # Real code scanning
+                path = parameters.get("path")
+                language = parameters.get("language", "auto")
+
+                if not path:
+                    raise ValueError("Path parameter is required")
+
+                scanner = CodeScanner()
+                vulns = await asyncio.to_thread(
+                    scanner.scan_directory, path, language
+                )
+
+                return {
+                    "path": path,
+                    "language": language,
+                    "total_vulnerabilities": len(vulns),
+                    "by_severity": {
+                        "CRITICAL": len([v for v in vulns if v.severity == "CRITICAL"]),
+                        "HIGH": len([v for v in vulns if v.severity == "HIGH"]),
+                        "MEDIUM": len([v for v in vulns if v.severity == "MEDIUM"]),
+                        "LOW": len([v for v in vulns if v.severity == "LOW"])
+                    },
+                    "vulnerabilities": [
+                        {
+                            "file": v.file,
+                            "line": v.line,
+                            "severity": v.severity,
+                            "title": v.title,
+                            "description": v.description,
+                            "cwe": v.cwe
+                        }
+                        for v in vulns[:20]  # Limit to 20 most critical
+                    ]
+                }
+
+            elif tool_name == "threat_cve_lookup":
+                # Real CVE lookup
+                cve_id = parameters.get("cve_id")
+
+                if not cve_id:
+                    raise ValueError("CVE ID parameter is required")
+
+                lookup = CVELookup()
+                cve_info = await asyncio.to_thread(lookup.lookup_cve, cve_id)
+
+                if not cve_info:
+                    return {
+                        "error": f"CVE {cve_id} not found",
+                        "status": "not_found"
+                    }
+
+                return {
+                    "id": cve_info.get("id"),
+                    "description": cve_info.get("description"),
+                    "published": cve_info.get("published"),
+                    "modified": cve_info.get("modified"),
+                    "cvss_score": cve_info.get("cvss_score"),
+                    "references": cve_info.get("references", []),
+                    "affected_products": cve_info.get("cpes", [])
+                }
+
+            else:
+                return {
+                    "error": f"Unknown tool: {tool_name}",
+                    "status": "not_implemented"
+                }
+
+        except Exception as e:
+            # Return error details
             return {
-                "summary": {
-                    "total_hosts": 5,
-                    "subnet": parameters.get("subnet", "unknown")
-                },
-                "hosts": [
-                    {"ip": f"192.168.1.{i}", "mac": f"00:00:00:00:00:0{i}"}
-                    for i in range(1, 6)
-                ]
+                "error": str(e),
+                "status": "execution_failed",
+                "tool": tool_name
             }
-        elif tool_name == "network_scan":
-            return {
-                "host": parameters.get("host", "unknown"),
-                "open_ports": 3,
-                "services": [
-                    {"port": 22, "service": "ssh"},
-                    {"port": 80, "service": "http"},
-                    {"port": 443, "service": "https"}
-                ]
-            }
-        else:
-            return {"status": "completed", "message": f"Tool {tool_name} executed"}
 
     def _add_to_history(
         self,
