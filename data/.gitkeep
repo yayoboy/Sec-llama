@@ -1,0 +1,4 @@
+# This directory stores runtime data
+# - logs/: Application logs
+# - reports/: Security scan reports
+# - database/: JSON database files

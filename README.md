@@ -18,63 +18,34 @@ Sec-Llama è una piattaforma unificata di cybersecurity testing che combina:
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (3 Comandi!)
 
-### Prerequisiti
-
-- **Docker** 20.10+ e **Docker Compose** 2.0+
-- **LLM Server** (Ollama o LM Studio) su un altro PC della LAN
-- **Rete LAN** con connettività tra i server
-
-### Setup LLM Server (su PC separato)
-
-**Opzione 1: Ollama** (Consigliato)
-```bash
-# Installa Ollama
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Scarica un modello
-ollama pull llama3.1:8b
-
-# Avvia con accesso rete
-OLLAMA_HOST=0.0.0.0:11434 ollama serve
-```
-
-**Opzione 2: LM Studio**
-1. Scarica da [https://lmstudio.ai/](https://lmstudio.ai/)
-2. Carica un modello
-3. Settings → Server → Host: `0.0.0.0`, Port: `1234`
-4. Start Server
-
-### Deploy Sec-Llama
+### Deploy Completo in 3 Step
 
 ```bash
-# 1. Vai alla directory
-cd implementations/lan-server
-
-# 2. Configura environment
+# 1. Configura environment
 cp .env.example .env
-nano .env
+nano .env  # Modifica OLLAMA_HOST, passwords, SECRET_KEY
 
-# IMPORTANTE: Modifica questi valori
-# - LLM_PROVIDER=ollama
-# - OLLAMA_HOST=http://192.168.1.100:11434
-# - SECRET_KEY=<genera-stringa-random-32-char>
-# - POSTGRES_PASSWORD=<password-sicura>
-# - REDIS_PASSWORD=<password-sicura>
-
-# 3. Avvia con Docker Compose
+# 2. Avvia tutto
 docker-compose up -d
 
-# 4. Verifica stato
-docker-compose ps
-docker-compose logs -f web-ui
-
-# 5. Accedi alla Web UI
+# 3. Accedi alla Web UI
 # Browser: http://localhost:8080
+# Login: admin / (password dal .env)
 ```
 
-**Guida completa**: Vedi [implementations/lan-server/QUICK_START.md](implementations/lan-server/QUICK_START.md)
+**✨ FATTO!** Hai ora:
+- ✅ PostgreSQL database
+- ✅ Redis cache
+- ✅ Web UI completa su porta 8080
+- ✅ Connessione al tuo LLM remoto
+
+### 📚 Guide Dettagliate
+
+- **⚡ Deploy Rapido**: [QUICK_START.md](QUICK_START.md) - Setup completo in 5 minuti
+- **🔧 Deploy Avanzato**: [implementations/lan-server/DEPLOY_GUIDE.md](implementations/lan-server/DEPLOY_GUIDE.md) - Configurazione production con Portainer
+- **📖 Features Complete**: [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Tutte le funzionalità disponibili
 
 ---
 
