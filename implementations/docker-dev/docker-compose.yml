@@ -1,0 +1,169 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: sec-llama-postgres-dev
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sec_llama}
+      POSTGRES_USER: ${POSTGRES_USER:-sec_llama}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_change_me}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sec_llama}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sec-llama-net
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: sec-llama-redis-dev
+    command: redis-server --appendonly yes
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sec-llama-net
+
+  # Ollama LLM Server
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sec-llama-ollama-dev
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - sec-llama-net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # MCP HTTP Server
+  mcp-server:
+    build:
+      context: ../../
+      dockerfile: implementations/mcp-http/Dockerfile
+    container_name: sec-llama-mcp-dev
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sec_llama}:${POSTGRES_PASSWORD:-dev_password_change_me}@postgres/${POSTGRES_DB:-sec_llama}
+      - REDIS_URL=redis://redis:6379
+      - MCP_API_KEYS=${MCP_API_KEYS:-dev-api-key-change-me}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    ports:
+      - "${MCP_PORT:-8765}:8765"
+    volumes:
+      - ../../shared:/app/shared:ro
+      - ./logs/mcp:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sec-llama-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Web UI (Development Mode)
+  web-ui:
+    build:
+      context: ../../
+      dockerfile: implementations/web-ui-full/Dockerfile.dev
+    container_name: sec-llama-web-ui-dev
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sec_llama}:${POSTGRES_PASSWORD:-dev_password_change_me}@postgres/${POSTGRES_DB:-sec_llama}
+      - REDIS_URL=redis://redis:6379
+      - MCP_SERVER_URL=http://mcp-server:8765
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-me}
+      - DEBUG=true
+      - LOG_LEVEL=${LOG_LEVEL:-DEBUG}
+    ports:
+      - "${WEB_UI_PORT:-8080}:8080"
+      - "${FRONTEND_DEV_PORT:-3000}:3000"
+    volumes:
+      - ../../shared:/app/shared:ro
+      - ../../implementations/web-ui-full/backend:/app/backend
+      - ../../implementations/web-ui-full/frontend:/app/frontend
+      - ./logs/web-ui:/app/logs
+      - ./reports:/app/reports
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      mcp-server:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - sec-llama-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # pgAdmin (Optional - for database management)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: sec-llama-pgadmin-dev
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@sec-llama.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - sec-llama-net
+    profiles:
+      - tools
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  ollama_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  sec-llama-net:
+    driver: bridge

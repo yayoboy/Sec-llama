@@ -1,466 +1,490 @@
-# 🛡️ Sec-Llama Suite
+# 🛡️ Sec-Llama - Local LLM Security Suite
 
-**The Most Comprehensive Local LLM-Powered Cybersecurity Testing Platform**
+**Complete cybersecurity testing platform powered by local LLMs with multiple deployment options**
 
-Una suite **enterprise-grade** completa per security testing, vulnerability assessment, e training di modelli LLM specializzati in sicurezza informatica. **100% locale e privato.**
-
----
-
-## ⚡ Quick Stats
-
-- 🎯 **90+ Security Features**
-- 🤖 **4 Specialized AI Agents**
-- 🔧 **10+ Tool Integrations**
-- 📊 **3 Report Formats**
-- 🎓 **Complete Training System**
-- 💯 **100% Local & Private**
+Una suite completa per security testing, vulnerability assessment, e AI-powered security analysis. **100% locale e privato.**
 
 ---
 
-## 🎯 Core Features
+## 🎯 Choose Your Implementation
 
-### 🌐 **Network Security Testing**
-- ✅ **Network Discovery**: ARP/ICMP/TCP scanning con fingerprinting OS
-- ✅ **Smart Port Scanning**: Nmap integration con AI-suggested strategies
-- ✅ **Service Analysis**: Version detection + CVE lookup automatico
-- ✅ **Wireless Security**: WiFi/Bluetooth/IoT auditing
-- ✅ **Traffic Analysis**: PCAP parsing, anomaly detection, credential extraction
-- ✅ **Attack Planning**: AI-powered attack chain generation
-- ✅ **MITM Testing**: ARP poisoning, SSL stripping, DNS spoofing
-- ✅ **Continuous Monitoring**: Real-time threat detection
+Sec-Llama offre **7 implementazioni indipendenti** per diversi use case. Scegli quella più adatta alle tue esigenze:
 
-### 💻 **Application Security**
-- ✅ **SAST**: Multi-language static code analysis (Python, JS, Java, Go, PHP)
-- ✅ **Code Review Assistant**: Git/GitHub integration per review automatico
-- ✅ **Dependency Check**: CVE scanning per librerie
-- ✅ **Container Security**: Docker image + runtime scanning
-- ✅ **API Security**: REST/GraphQL fuzzing e testing
+| Implementation | Best For | Setup Time | Requirements |
+|---------------|----------|------------|--------------|
+| **[Standalone](#-standalone)** | Quick local use, CLI tools | 2 min | Python 3.8+ |
+| **[MCP stdio](#-mcp-stdio)** | Claude Desktop integration | 5 min | Python 3.8+, Claude Desktop |
+| **[MCP HTTP](#-mcp-http)** | Remote access, LAN deployment | 5 min | Python 3.8+ |
+| **[Web UI Full](#-web-ui-full)** | Complete web interface + AI config | 10 min | Python 3.8+, Node.js |
+| **[Docker Dev](#-docker-dev)** | Development environment | 5 min | Docker |
+| **[Docker Production](#-docker-production)** | Production deployment, scaling | 15 min | Docker Swarm |
+| **[Live USB](#-live-usb)** | Portable, boot from USB | 20 min | USB 32GB+ |
 
-### 🎯 **Penetration Testing**
-- ✅ **Exploit Suggestions**: CVE matching e exploit generation
-- ✅ **Payload Crafting**: Custom payload con evasion techniques
-- ✅ **Attack Surface Analysis**: Risk assessment e prioritization
-- ✅ **Post-Exploitation**: Lateral movement strategies
+---
 
-### 🔧 **Security Tool Integrations** 🆕
-- ✅ **Metasploit**: Automated exploitation e payload generation
-- ✅ **Burp Suite**: Web app scanning e vulnerability detection
-- ✅ **BloodHound**: Active Directory attack path analysis
-- ✅ **Trivy**: Container vulnerability scanning
-- ✅ **Nmap/Masscan**: Network scanning automation
+## 🚀 Quick Start by Implementation
 
-### 🤖 **Multi-Agent System** 🆕
-- ✅ **Recon Agent**: Network discovery specialist
-- ✅ **Exploit Agent**: Vulnerability exploitation expert
-- ✅ **Defense Agent**: Blue team defensive specialist
-- ✅ **Coordinator**: Orchestrates collaborative assessments
-- ✅ Inter-agent communication e knowledge sharing
+### 📦 Standalone
 
-### 🔍 **Threat Intelligence**
-- ✅ **CVE Lookup**: NVD API integration con AI analysis
-- ✅ **IOC Analysis**: Auto-type detection e threat classification
-- ✅ **OSINT**: Open Source Intelligence gathering
+**Perfect for:** Quick local use, command-line security testing
 
-### 📝 **Log Analysis & SIEM** 🆕
-- ✅ **Multi-format Parsing**: Apache, Nginx, Auth logs
-- ✅ **Attack Detection**: SQL injection, XSS, LFI, RFI patterns
-- ✅ **Anomaly Detection**: AI-powered statistical analysis
-- ✅ **Real-time Monitoring**: Continuous log analysis
-
-### 🚨 **Incident Response** 🆕
-- ✅ **IR Automation**: Incident tracking e management
-- ✅ **NIST Playbooks**: Automated response plan generation
-- ✅ **Containment Planning**: AI-generated containment actions
-- ✅ **IOC Tracking**: Indicator management
-
-### 📊 **Advanced Reporting** 🆕
-- ✅ **Executive Reports**: Business-focused summaries
-- ✅ **Technical Reports**: Detailed findings
-- ✅ **Compliance Reports**: OWASP, PCI-DSS, ISO 27001
-- ✅ **PDF/HTML Export**: Professional report generation
-
-### 🎓 **LLM Training & Fine-Tuning** 🆕
-- ✅ **Dataset Collection**: Automated CVE/exploit data collection
-- ✅ **Model Training**: Ollama, LoRA/QLoRA, Unsloth integration
-- ✅ **Model Evaluation**: Security-specific benchmarks
-- ✅ **Custom Datasets**: Create proprietary security models
-- ✅ **Progressive Training**: Continuous model improvement
-
-## 🏗️ Architettura
-
-```
-sec-llama-suite/
-├── core/                   # Core functionality
-│   ├── llm_interface.py   # Ollama/LLM abstraction
-│   ├── prompt_templates.py # Security prompts
-│   └── config.py          # Configuration
-├── modules/               # Security modules
-│   ├── network/          # Network security
-│   ├── vuln_scanner/     # Vulnerability scanning
-│   ├── pentest_assistant/# Pentest automation
-│   ├── threat_intel/     # Threat intelligence
-│   └── ...
-├── integrations/         # Tool integrations
-│   ├── nmap_integration.py
-│   ├── metasploit_integration.py
-│   └── ...
-├── agents/              # Multi-agent system
-├── cli/                 # CLI interface
-└── web/                 # Web dashboard
-```
-
-## 🚀 Quick Start
-
-### Prerequisiti
 ```bash
-# Installa Ollama
+cd implementations/standalone
+./setup.sh
+./sec-llama.sh scan network 192.168.1.0/24
+./sec-llama.sh threat cve CVE-2024-1234
+```
+
+**Features:**
+- ✅ CLI tool for immediate use
+- ✅ All security modules
+- ✅ Local Ollama integration
+- ✅ Report generation
+
+📚 **[Standalone Guide](implementations/standalone/README.md)**
+
+---
+
+### 🔌 MCP stdio
+
+**Perfect for:** Using Sec-Llama tools inside Claude Desktop
+
+```bash
+cd implementations/mcp-stdio
+./setup.sh
+./start.sh
+# Restart Claude Desktop - tools will appear automatically
+```
+
+**Features:**
+- ✅ 8+ security tools in Claude Desktop
+- ✅ stdio transport (local only)
+- ✅ Zero configuration
+- ✅ Automatic tool discovery
+
+📚 **[MCP stdio Guide](implementations/mcp-stdio/README.md)**
+
+---
+
+### 🌐 MCP HTTP
+
+**Perfect for:** Remote access, team collaboration, LAN deployment
+
+```bash
+cd implementations/mcp-http
+./setup.sh
+./start.sh
+# Access from: http://localhost:8765
+```
+
+**Features:**
+- ✅ HTTP/SSE transport
+- ✅ API key authentication
+- ✅ Rate limiting
+- ✅ Multi-client support
+- ✅ Audit logging
+
+📚 **[MCP HTTP Guide](implementations/mcp-http/README.md)**
+
+---
+
+### 🎨 Web UI Full
+
+**Perfect for:** Complete web interface with AI configuration
+
+```bash
+cd implementations/web-ui-full
+./setup.sh
+./start.sh
+# Open: http://localhost:8080
+```
+
+**Features:**
+- ✅ **AI Configuration UI** - Configure local/remote Ollama
+- ✅ **Model Management** - Pull, delete, test models
+- ✅ **Dashboard** - Real-time statistics
+- ✅ **Tools Execution** - Web-based security tools
+- ✅ **API Keys Management** - Generate and manage keys
+- ✅ **Audit Logs** - Complete activity tracking
+- ✅ **Report Export** - PDF/HTML/JSON
+
+📚 **[Web UI Full Guide](implementations/web-ui-full/README.md)**
+
+---
+
+### 🐳 Docker Dev
+
+**Perfect for:** Development environment with all services
+
+```bash
+cd implementations/docker-dev
+docker-compose up -d
+# Access: http://localhost:8080
+```
+
+**Features:**
+- ✅ Complete dev environment
+- ✅ Hot reload
+- ✅ PostgreSQL + Redis
+- ✅ Ollama container
+- ✅ Easy debugging
+
+📚 **[Docker Dev Guide](implementations/docker-dev/README.md)**
+
+---
+
+### 🏭 Docker Production
+
+**Perfect for:** Production deployment, high availability, scaling
+
+```bash
+cd implementations/docker-production
+./install.sh
+# Stack deployed with auto-scaling
+```
+
+**Features:**
+- ✅ **Docker Stack** - Swarm orchestration
+- ✅ **Auto-scaling** - Scale services on demand
+- ✅ **Secrets Management** - Secure credentials
+- ✅ **Health Checks** - Automatic recovery
+- ✅ **Nginx Reverse Proxy** - HTTPS, rate limiting
+- ✅ **Automatic Backups** - Scheduled database backups
+- ✅ **High Availability** - Multi-node support
+
+📚 **[Docker Production Guide](implementations/docker-production/README.md)**
+
+---
+
+### 💿 Live USB
+
+**Perfect for:** Portable security testing, boot from USB
+
+```bash
+cd implementations/live-usb
+sudo ./create-usb.sh /dev/sdX
+# Boot from USB and run Sec-Llama
+```
+
+**Features:**
+- ✅ Bootable USB with persistence
+- ✅ Pre-configured Kali/Parrot
+- ✅ All tools pre-installed
+- ✅ Portable LLM models
+- ✅ External storage support
+
+📚 **[Live USB Guide](implementations/live-usb/README.md)**
+
+---
+
+## 🎯 Core Security Features
+
+All implementations include these core capabilities:
+
+### 🌐 Network Security
+- Network discovery (ARP/ICMP/TCP)
+- Smart port scanning (Nmap integration)
+- Service analysis + CVE lookup
+- Wireless security (WiFi/Bluetooth/IoT)
+- Traffic analysis (PCAP parsing)
+- MITM testing
+- Attack planning
+
+### 💻 Application Security
+- SAST (Python, JS, Java, Go, PHP)
+- Code review assistant
+- Dependency scanning
+- Container security
+- API fuzzing (REST/GraphQL)
+
+### 🎯 Penetration Testing
+- Exploit suggestions
+- Payload crafting
+- Attack surface analysis
+- Post-exploitation strategies
+
+### 🔧 Tool Integrations
+- Metasploit
+- Burp Suite
+- BloodHound
+- Trivy
+- Nmap/Masscan
+
+### 🤖 Multi-Agent System
+- Recon Agent
+- Exploit Agent
+- Defense Agent
+- Coordinator
+- Inter-agent communication
+
+### 🔍 Threat Intelligence
+- CVE lookup (NVD API)
+- IOC analysis
+- OSINT gathering
+
+### 📝 Log Analysis & SIEM
+- Multi-format parsing
+- Attack detection
+- Anomaly detection
+- Real-time monitoring
+
+### 🚨 Incident Response
+- IR automation
+- NIST playbooks
+- Containment planning
+- IOC tracking
+
+### 📊 Advanced Reporting
+- Executive reports
+- Technical reports
+- Compliance reports (OWASP, PCI-DSS, ISO 27001)
+- PDF/HTML export
+
+### 🎓 LLM Training & Fine-Tuning
+- Dataset collection (CVE/exploit data)
+- Model training (Ollama, LoRA/QLoRA)
+- Model evaluation
+- Custom datasets
+- Progressive training
+
+---
+
+## 📋 Prerequisites
+
+### Common Requirements
+- **Python 3.8+** (for Python-based implementations)
+- **Ollama** (for AI features)
+
+### Optional Requirements
+- **Docker** (for Docker implementations)
+- **Node.js** (for Web UI)
+- **Claude Desktop** (for MCP stdio)
+
+### Install Ollama
+```bash
+# Install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
-# Scarica un modello (es. Llama 3.1)
+# Pull a model
 ollama pull llama3.1:8b
-# Per analisi più complesse:
+
+# For more complex analysis
 ollama pull llama3.1:70b
 ```
 
-### Installazione
+---
+
+## 📚 Documentation
+
+### Implementation Guides
+- **[Standalone](implementations/standalone/README.md)** - CLI tool for local use
+- **[MCP stdio](implementations/mcp-stdio/README.md)** - Claude Desktop integration
+- **[MCP HTTP](implementations/mcp-http/README.md)** - Remote MCP server
+- **[Web UI Full](implementations/web-ui-full/README.md)** - Complete web interface
+- **[Docker Dev](implementations/docker-dev/README.md)** - Development environment
+- **[Docker Production](implementations/docker-production/README.md)** - Production deployment
+- **[Live USB](implementations/live-usb/README.md)** - Bootable USB
+
+### General Documentation
+- **[Features Complete](docs/FEATURES.md)** - Complete feature list
+- **[Quick Start IT](docs/QUICK_START_IT.md)** - Quick start guide (Italian)
+- **[Navigation Guide](docs/NAVIGATION.md)** - Navigate the new structure
+- **[API Reference](docs/api.md)** - API documentation
+- **[Training Guide](docs/TRAINING.md)** - LLM training system
+- **[Contributing](docs/contributing.md)** - How to contribute
+
+---
+
+## 🏗️ Project Structure
+
+```
+Sec-llama/
+├── implementations/           # 7 independent implementations
+│   ├── standalone/           # CLI tool
+│   ├── mcp-stdio/           # MCP for Claude Desktop
+│   ├── mcp-http/            # MCP remote server
+│   ├── web-ui-full/         # Complete Web UI
+│   ├── docker-dev/          # Development environment
+│   ├── docker-production/   # Production stack
+│   └── live-usb/            # Bootable USB
+│
+├── shared/                   # Shared libraries
+│   ├── core/                # Core security modules
+│   ├── ai/                  # AI/LLM integration
+│   └── utils/               # Common utilities
+│
+└── docs/                     # Documentation
+```
+
+**Note:** Each implementation is completely independent and self-contained. You can use one or multiple implementations based on your needs.
+
+---
+
+## 🔧 Configuration
+
+### Remote Ollama Setup
+
+If you want to use Ollama on a different machine:
+
+**On the Ollama server:**
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/Sec-llama.git
-cd Sec-llama
+export OLLAMA_HOST=0.0.0.0:11434
+ollama serve
+```
 
-# Installa dipendenze
-pip install -r requirements.txt
+**In Sec-Llama:**
 
-# O usa Docker
+For Web UI implementations:
+1. Open Web UI → AI Configuration
+2. Set host: `http://SERVER_IP:11434`
+3. Test connection
+4. Save
+
+For other implementations, edit `config.yaml`:
+```yaml
+ollama:
+  host: http://SERVER_IP:11434
+  timeout: 120
+  enabled: true
+```
+
+---
+
+## 🐳 Docker Quick Reference
+
+### Docker Dev
+```bash
+cd implementations/docker-dev
 docker-compose up -d
+docker-compose logs -f
+docker-compose down
 ```
 
-### Installazione su Live USB 💿 🆕
-
-**Sec-Llama può funzionare su distribuzioni live (Kali, Parrot, ecc.) con persistenza completa!**
-
+### Docker Production (Stack)
 ```bash
-# 1. Crea USB con persistenza (da Linux)
-sudo ./scripts/create_persistent_usb.sh /dev/sdX kali-linux-2024.iso 32GB
-
-# 2. Boot da USB e seleziona "Live USB Persistence"
-
-# 3. Setup automatico completo
-sudo ./scripts/setup_persistent_env.sh
-
-# 4. (Opzionale) Usa storage esterno per modelli
-sudo ./scripts/external_models_storage.sh sdc1
+cd implementations/docker-production
+./install.sh                                    # Install
+docker stack services sec-llama                 # Check services
+docker service logs -f sec-llama_web-ui        # View logs
+docker service scale sec-llama_web-ui=3        # Scale
+docker stack rm sec-llama                      # Remove
 ```
 
-**Tutti i dati vengono salvati!** Reports, database, modelli LLM, configurazioni.
+---
 
-📚 **[Guida Completa Live USB](docs/LIVE_USB_GUIDE.md)** - Setup, backup, troubleshooting
+## 📊 Example Commands
 
-### MCP Server 🔌 🆕
-
-**Usa Sec-Llama come server MCP** per integrarlo con Claude Desktop o deployment LAN!
-
-#### Uso Locale (Claude Desktop)
-
-```bash
-# Setup automatico
-./scripts/install_mcp_client.sh
-
-# Riavvia Claude Desktop
-# Troverai "sec-llama" tra gli strumenti disponibili!
-```
-
-#### Deployment LAN (HTTP/SSE)
-
-```bash
-# Genera API key
-export MCP_API_KEYS=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-
-# Avvia server HTTP
-MCP_API_KEYS="$MCP_API_KEYS" ./scripts/start_mcp_server.sh http
-
-# Access from: http://your-ip:8765
-```
-
-#### Docker Deployment
-
-```bash
-# Start MCP server + Ollama
-docker-compose -f docker-compose.mcp.yml up -d
-
-# Pull model
-docker-compose -f docker-compose.mcp.yml exec ollama ollama pull llama3.1:8b
-
-# Check health
-curl http://localhost:8765/health
-```
-
-**Funzionalità MCP:**
-- ✅ **8+ Security Tools** esposti via MCP
-- ✅ **Dual Transport**: stdio (local) + HTTP/SSE (LAN)
-- ✅ **API Key Auth** per accesso sicuro
-- ✅ **Rate Limiting** e audit logging
-- ✅ **Docker ready** per deployment facile
-
-📚 **[Guida Completa MCP Server](docs/MCP_SERVER_GUIDE.md)** - Setup, configurazione, API reference
-
-### Configurazione
-```bash
-# Copia configurazione di esempio
-cp config/config.example.yaml config/config.yaml
-
-# Modifica con il tuo editor
-nano config/config.yaml
-```
-
-## 📚 Quick Start Examples
-
-### 🌐 Network Security
-
+### Network Security
 ```bash
 # Discover hosts
-sec-llama network discover --subnet 192.168.1.0/24
+./sec-llama.sh scan network 192.168.1.0/24
 
-# Smart AI-powered port scanning
-sec-llama network scan --host 192.168.1.10 --ai-suggest
+# AI-powered port scanning
+./sec-llama.sh scan ports --host 192.168.1.10 --ai-suggest
 
-# Full vulnerability assessment
-sec-llama network vuln-scan --network 192.168.1.0/24 --depth full
+# Vulnerability assessment
+./sec-llama.sh scan vuln --network 192.168.1.0/24
 
 # Analyze network traffic
-sec-llama traffic analyze --pcap capture.pcap
-sec-llama traffic find-creds --pcap capture.pcap
-
-# WiFi security audit
-sec-llama wireless scan --interface wlan0
+./sec-llama.sh analyze traffic --pcap capture.pcap
 ```
 
-### 💻 Application Security
-
+### Application Security
 ```bash
 # SAST code scanning
-sec-llama code scan --path ./myapp --language python
-
-# Git commit review
-sec-llama review commit --hash abc123
-
-# GitHub PR review
-sec-llama review pr --number 42 --repo owner/repo
+./sec-llama.sh scan code --path ./myapp --language python
 
 # Container security
-sec-llama container scan-image --image nginx:latest
+./sec-llama.sh scan container --image nginx:latest
 
 # API fuzzing
-sec-llama api fuzz --url https://api.example.com --endpoint /users
+./sec-llama.sh fuzz api --url https://api.example.com
 ```
 
-### 🤖 Multi-Agent Collaboration
-
+### Threat Intelligence
 ```bash
-# Run collaborative security assessment
-sec-llama agent collab-assess --target 192.168.1.0/24
+# CVE lookup
+./sec-llama.sh threat cve CVE-2024-1234
 
-# Check agent status
-sec-llama agent status
+# IOC analysis
+./sec-llama.sh threat ioc 192.168.1.100
+
+# Search CVEs
+./sec-llama.sh threat search --keyword "apache"
 ```
 
-### 📝 Log Analysis & SIEM
-
+### LLM Training
 ```bash
-# Analyze logs for attacks
-sec-llama logs analyze --file /var/log/apache2/access.log
-
-# Find attack patterns
-sec-llama logs find-attacks --file /var/log/auth.log
-```
-
-### 🚨 Incident Response
-
-```bash
-# Create incident
-sec-llama incident create \
-  --title "Ransomware Attack" \
-  --severity CRITICAL
-
-# Execute containment
-sec-llama incident contain --id INC-0001
-```
-
-### 🎓 LLM Training
-
-```bash
-# Collect CVE training data
-sec-llama train collect-dataset --type cve --max-items 10000
-
-# Prepare training dataset
-sec-llama train prepare-data \
-  --datasets "cve_dataset.json,security_qa.json" \
-  --format alpaca
+# Collect training data
+./sec-llama.sh train collect --type cve --max 10000
 
 # Fine-tune model
-sec-llama train fine-tune \
-  --base-model llama3.1:8b \
+./sec-llama.sh train finetune \
+  --base llama3.1:8b \
   --dataset training_data.json \
   --name sec-llama-8b
 
 # Evaluate model
-sec-llama train evaluate --model sec-llama-8b
-
-# Compare models
-sec-llama train compare --models "llama3.1:8b,sec-llama-8b"
+./sec-llama.sh train evaluate --model sec-llama-8b
 ```
 
-### 🔍 Threat Intelligence
+---
 
-```bash
-# CVE lookup
-sec-llama threat cve --id CVE-2024-1234
+## ⚖️ Legal & Ethics
 
-# Search CVEs
-sec-llama threat cve-search --keyword "apache"
+**IMPORTANT:** This tool is intended ONLY for:
+- ✅ Authorized security testing
+- ✅ CTF competitions
+- ✅ Security research
+- ✅ Personal test/lab environments
+- ✅ Educational purposes
 
-# IOC analysis
-sec-llama threat ioc --indicator 192.168.1.100
-```
+**DO NOT use for:**
+- ❌ Unauthorized access to systems
+- ❌ Illegal activities
+- ❌ Testing without explicit permission
 
-### 🎯 Penetration Testing
+Users are responsible for appropriate use of this software.
 
-```bash
-# Generate attack plan
-sec-llama pentest attack-plan --target 192.168.1.10 --objective "gain access"
+---
 
-# Find exploits
-sec-llama pentest exploit --service "Apache" --version "2.4.49"
+## 🤝 Contributing
 
-# Generate payload
-sec-llama pentest payload --type reverse_shell --os linux
-```
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-### 📊 Reporting
+---
 
-```bash
-# Generate executive report
-sec-llama report generate --target "Corporate Network" --type executive --format pdf
+## 📄 License
 
-# Generate technical report
-sec-llama report generate --target "Web Server" --type technical --format html
-```
+MIT License - see [LICENSE](LICENSE)
 
-### 💬 Natural Language Queries
-
-```bash
-# Ask questions in plain English
-sec-llama ask "How do I test for SQL injection?"
-sec-llama ask "What are the steps for privilege escalation on Linux?"
-sec-llama ask "Generate an attack plan for this network"
-```
-
-## 🔧 Configurazione
-
-### config.yaml
-
-```yaml
-llm:
-  provider: "ollama"
-  model: "llama3.1:8b"
-  base_url: "http://localhost:11434"
-  temperature: 0.7
-
-network:
-  default_timeout: 30
-  max_threads: 10
-  stealth_mode: false
-
-scanning:
-  nmap_path: "/usr/bin/nmap"
-  masscan_path: "/usr/bin/masscan"
-
-reporting:
-  output_dir: "./reports"
-  format: "pdf"
-
-database:
-  cve_db_path: "./database/cve.db"
-  network_inventory: "./database/network.db"
-```
-
-## 🐳 Docker Deployment
-
-```bash
-# Build
-docker build -t sec-llama-suite .
-
-# Run
-docker run -it --rm \
-  --network host \
-  -v $(pwd)/config:/app/config \
-  -v $(pwd)/reports:/app/reports \
-  sec-llama-suite
-
-# O usa docker-compose
-docker-compose up -d
-```
-
-## 🛠️ Integrazioni
-
-### Tools Supportati
-- **Nmap**: Port scanning e service detection
-- **Masscan**: Fast scanning
-- **Metasploit**: Exploitation framework
-- **Wireshark/tshark**: Traffic analysis
-- **Aircrack-ng**: Wireless security
-- **Bettercap**: Network attacks
-- **Nuclei**: Template-based scanning
-- **BloodHound**: AD analysis
-- **Burp Suite**: Web application testing
-
-## 📖 Documentazione
-
-- **[Guida MCP Server](docs/MCP_SERVER_GUIDE.md)** 🆕 - Server MCP per Claude Desktop e LAN
-- **[Guida Live USB](docs/LIVE_USB_GUIDE.md)** 🆕 - Setup su distribuzioni live con persistenza
-- **[Guida Dataset](docs/DATASETS_GUIDE.md)** 🆕 - Come ottenere e creare dataset per training
-- **[Features Complete](docs/FEATURES.md)** - Lista completa 90+ funzionalità
-- **[Training Guide](docs/TRAINING.md)** - Sistema training e fine-tuning LLM
-- **[Quick Start](docs/QUICK_START.md)** - Guida rapida per iniziare
-- [API Reference](docs/api.md)
-- [Esempi Avanzati](docs/examples.md)
-- [Contribuire](docs/contributing.md)
-
-## ⚖️ Legal & Etica
-
-**IMPORTANTE**: Questo tool è destinato SOLO a:
-- ✅ Test di sicurezza autorizzati
-- ✅ CTF e competizioni di sicurezza
-- ✅ Ricerca sulla sicurezza
-- ✅ Ambienti di test/lab personali
-- ✅ Scopi educativi
-
-**NON utilizzare per:**
-- ❌ Accesso non autorizzato a sistemi
-- ❌ Attività illegali
-- ❌ Test senza permesso esplicito
-
-L'utente è responsabile dell'uso appropriato di questo software.
-
-## 🤝 Contribuire
-
-Contributi benvenuti! Vedi [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## 📄 Licenza
-
-MIT License - vedi [LICENSE](LICENSE)
+---
 
 ## 🙏 Credits
 
 - **Ollama**: Local LLM runtime
-- **LangChain**: LLM framework
+- **FastAPI**: Modern web framework
+- **Vue.js**: Progressive JavaScript framework
 - **Nmap**: Network scanning
+- **Docker**: Containerization
 - Community open source security tools
 
-## 📞 Supporto
+---
 
-- Issues: [GitHub Issues](https://github.com/yourusername/Sec-llama/issues)
-- Discussions: [GitHub Discussions](https://github.com/yourusername/Sec-llama/discussions)
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/yourusername/Sec-llama/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/Sec-llama/discussions)
+- **Documentation**: [docs/](docs/)
+
+---
+
+## 🚀 Getting Started
+
+1. **Choose an implementation** from the table above
+2. **Follow the Quick Start** for that implementation
+3. **Configure Ollama** (local or remote)
+4. **Start testing!**
 
 ---
 
