@@ -10,6 +10,7 @@ from . import config
 from . import api_keys
 from . import audit_logs
 from . import websocket
+from . import ai_config
 
 __all__ = [
     "dashboard",
@@ -17,5 +18,6 @@ __all__ = [
     "config",
     "api_keys",
     "audit_logs",
-    "websocket"
+    "websocket",
+    "ai_config"
 ]

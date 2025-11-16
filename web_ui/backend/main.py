@@ -22,7 +22,8 @@ from web_ui.backend.routers import (
     config,
     api_keys,
     audit_logs,
-    websocket
+    websocket,
+    ai_config
 )
 
 # Setup logging
@@ -80,6 +81,7 @@ app.include_router(config.router, prefix="/api/config", tags=["Configuration"])
 app.include_router(api_keys.router, prefix="/api/api-keys", tags=["API Keys"])
 app.include_router(audit_logs.router, prefix="/api/audit-logs", tags=["Audit Logs"])
 app.include_router(websocket.router, prefix="/ws", tags=["WebSocket"])
+app.include_router(ai_config.router, prefix="/api/ai", tags=["AI Configuration"])
 
 
 @app.get("/")

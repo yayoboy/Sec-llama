@@ -1,0 +1,303 @@
+version: '3.8'
+
+# Sec-Llama Complete Docker Stack
+# Automated deployment with all dependencies
+
+services:
+  # PostgreSQL Database (for production use)
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: sec_llama
+      POSTGRES_USER: sec_llama
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme123}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - sec-llama-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sec_llama"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Redis Cache (for session management and caching)
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme123}
+    volumes:
+      - redis-data:/data
+    networks:
+      - sec-llama-internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Ollama LLM Server
+  ollama:
+    image: ollama/ollama:latest
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_ORIGINS=*
+    volumes:
+      - ollama-models:/root/.ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    networks:
+      - sec-llama-internal
+      - sec-llama-external
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+  # Ollama Model Initializer (init container)
+  ollama-init:
+    image: ollama/ollama:latest
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - DEFAULT_MODEL=${DEFAULT_MODEL:-llama3.1:8b}
+    networks:
+      - sec-llama-internal
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        echo "Waiting for Ollama to be ready..."
+        until curl -f http://ollama:11434/api/tags; do
+          echo "Ollama not ready, waiting..."
+          sleep 5
+        done
+        echo "Ollama is ready! Pulling default model: $${DEFAULT_MODEL}"
+        ollama pull $${DEFAULT_MODEL} || echo "Model pull failed, will retry later"
+        echo "Model initialization complete"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+
+  # Sec-Llama MCP Server
+  mcp-server:
+    image: sec-llama/mcp-server:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    depends_on:
+      - ollama
+      - postgres
+      - redis
+    environment:
+      # Ollama configuration
+      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.1:8b}
+
+      # Database configuration
+      - DATABASE_URL=postgresql://sec_llama:${POSTGRES_PASSWORD:-changeme123}@postgres:5432/sec_llama
+
+      # Redis configuration
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme123}@redis:6379/0
+
+      # MCP Server configuration
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8765
+      - MCP_API_KEYS=${MCP_API_KEYS:-}
+
+      # Security
+      - ALLOWED_NETWORKS=${ALLOWED_NETWORKS:-0.0.0.0/0}
+      - REQUIRE_CONFIRMATION=${REQUIRE_CONFIRMATION:-false}
+
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+      - ./database:/app/database
+    ports:
+      - "${MCP_PORT:-8765}:8765"
+    networks:
+      - sec-llama-internal
+      - sec-llama-external
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Sec-Llama Web UI
+  web-ui:
+    image: sec-llama/web-ui:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.web-ui
+    depends_on:
+      - mcp-server
+      - postgres
+      - redis
+    environment:
+      # Ollama configuration
+      - OLLAMA_HOST=http://ollama:11434
+
+      # Database configuration
+      - DATABASE_URL=postgresql://sec_llama:${POSTGRES_PASSWORD:-changeme123}@postgres:5432/sec_llama
+
+      # Redis configuration
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme123}@redis:6379/0
+
+      # MCP Server connection
+      - MCP_SERVER_URL=http://mcp-server:8765
+
+      # Web UI configuration
+      - WEB_UI_HOST=0.0.0.0
+      - WEB_UI_PORT=8080
+      - SECRET_KEY=${SECRET_KEY:-changeme-secret-key-here}
+
+      # Security
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+      - ./database:/app/database
+    ports:
+      - "${WEB_UI_PORT:-8080}:8080"
+    networks:
+      - sec-llama-internal
+      - sec-llama-external
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Nginx Reverse Proxy (optional, for production)
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      - web-ui
+      - mcp-server
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    ports:
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTP_PORT:-80}:80"
+    networks:
+      - sec-llama-external
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    profiles:
+      - with-nginx
+
+  # Database Backup Service
+  backup:
+    image: postgres:15-alpine
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=sec_llama
+      - POSTGRES_USER=sec_llama
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme123}
+      - BACKUP_SCHEDULE=${BACKUP_SCHEDULE:-0 2 * * *}
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh:ro
+    networks:
+      - sec-llama-internal
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        echo "Installing crond..."
+        apk add --no-cache dcron
+        echo "$${BACKUP_SCHEDULE} /backup.sh" | crontab -
+        echo "Backup cron job configured: $${BACKUP_SCHEDULE}"
+        crond -f -l 2
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    profiles:
+      - with-backup
+
+networks:
+  sec-llama-internal:
+    driver: overlay
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
+
+  sec-llama-external:
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 172.22.1.0/24
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  ollama-models:
+    driver: local
+  nginx-cache:
+    driver: local
+
+configs:
+  mcp_config:
+    file: ./config/mcp_server_config.yaml
+
+secrets:
+  postgres_password:
+    external: true
+  redis_password:
+    external: true
+  secret_key:
+    external: true

@@ -56,7 +56,8 @@ import {
   WrenchScrewdriverIcon,
   Cog6ToothIcon,
   KeyIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  CpuChipIcon
 } from '@heroicons/vue/24/outline'
 
 const wsStore = useWebSocketStore()
@@ -73,6 +74,12 @@ const navItems = [
     label: 'Tools',
     path: '/tools',
     icon: WrenchScrewdriverIcon
+  },
+  {
+    name: 'ai-config',
+    label: 'AI Configuration',
+    path: '/ai-config',
+    icon: CpuChipIcon
   },
   {
     name: 'config',

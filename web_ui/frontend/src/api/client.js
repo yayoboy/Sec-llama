@@ -143,5 +143,41 @@ export default {
     return apiClient.delete('/audit-logs', {
       params: days ? { days } : {}
     })
+  },
+
+  // AI Configuration
+  getAIConfiguration() {
+    return apiClient.get('/ai')
+  },
+  updateAIConfiguration(data) {
+    return apiClient.put('/ai', data)
+  },
+  listAIModels() {
+    return apiClient.get('/ai/models')
+  },
+  pullAIModel(modelName, insecure = false) {
+    return apiClient.post('/ai/models/pull', {
+      model_name: modelName,
+      insecure
+    })
+  },
+  deleteAIModel(modelName) {
+    return apiClient.delete(`/ai/models/${modelName}`)
+  },
+  getAIModelInfo(modelName) {
+    return apiClient.get(`/ai/models/${modelName}/info`)
+  },
+  testAIConnection(host, timeout = 10) {
+    return apiClient.post('/ai/test-connection', { host, timeout })
+  },
+  testAIGeneration(model, prompt = 'Hello!', maxTokens = 50) {
+    return apiClient.post('/ai/test-generation', {
+      model,
+      prompt,
+      max_tokens: maxTokens
+    })
+  },
+  getAIStatus() {
+    return apiClient.get('/ai/status')
   }
 }

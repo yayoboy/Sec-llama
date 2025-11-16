@@ -5,6 +5,7 @@ import ToolsView from '@/views/ToolsView.vue'
 import ConfigView from '@/views/ConfigView.vue'
 import ApiKeysView from '@/views/ApiKeysView.vue'
 import AuditLogsView from '@/views/AuditLogsView.vue'
+import AIConfigView from '@/views/AIConfigView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,6 +43,12 @@ const router = createRouter({
           name: 'audit-logs',
           component: AuditLogsView,
           meta: { title: 'Audit Logs' }
+        },
+        {
+          path: 'ai-config',
+          name: 'ai-config',
+          component: AIConfigView,
+          meta: { title: 'AI Configuration' }
         }
       ]
     }
