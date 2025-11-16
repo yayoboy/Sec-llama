@@ -270,3 +270,320 @@ Provide a comprehensive, professional response that:
 Be practical and specific in your recommendations."""
 
         return prompt
+
+    @staticmethod
+    def get_code_vulnerability_prompt(code: str, language: str = "python", context: str = "") -> str:
+        """
+        Generate prompt for code vulnerability analysis
+
+        Used by: modules/code_review/git_reviewer.py
+        """
+        prompt = f"""You are a senior security engineer conducting a vulnerability assessment of {language} code.
+
+{f'Context: {context}' if context else ''}
+
+Code to analyze:
+```{language}
+{code}
+```
+
+Perform a deep security analysis and identify ALL vulnerabilities:
+
+**1. CRITICAL VULNERABILITIES** (Immediate Action Required):
+   - Remote Code Execution (RCE)
+   - SQL Injection (SQLi)
+   - Authentication bypass
+   - Hardcoded credentials/secrets
+   - Deserialization vulnerabilities
+
+**2. HIGH SEVERITY VULNERABILITIES**:
+   - Cross-Site Scripting (XSS)
+   - Command Injection
+   - Path Traversal
+   - XML External Entity (XXE)
+   - Server-Side Request Forgery (SSRF)
+   - Insecure Direct Object References (IDOR)
+
+**3. MEDIUM SEVERITY ISSUES**:
+   - Weak cryptography
+   - Missing input validation
+   - Information disclosure
+   - Insecure session management
+   - Missing security headers
+
+**4. LOW SEVERITY & CODE QUALITY**:
+   - Error handling issues
+   - Logging sensitive data
+   - Resource leaks
+   - Race conditions
+
+For EACH vulnerability found, provide:
+- **Line Number**: Exact location in code
+- **Severity**: Critical/High/Medium/Low
+- **CWE ID**: Common Weakness Enumeration identifier
+- **Vulnerability Type**: Specific category
+- **Explanation**: Why this is vulnerable
+- **Exploit Scenario**: How an attacker could exploit this
+- **Remediation**: Secure code example to fix the issue
+- **References**: OWASP or security guidelines
+
+Be extremely thorough - this code may go into production."""
+
+        return prompt
+
+    @staticmethod
+    def get_exploit_suggestion_prompt(vulnerability_info: Dict[str, Any], target_info: Dict[str, Any]) -> str:
+        """
+        Generate prompt for exploit suggestions
+
+        Used by: modules/pentest_assistant/attack_planner.py
+
+        **IMPORTANT**: For authorized penetration testing only!
+        """
+        prompt = f"""You are a penetration testing expert suggesting exploitation techniques.
+
+**AUTHORIZATION NOTICE**: This analysis is for AUTHORIZED penetration testing only.
+
+Vulnerability Information:
+{vulnerability_info}
+
+Target Information:
+{target_info}
+
+Provide exploitation guidance for authorized security testing:
+
+**1. EXPLOITATION STRATEGY**:
+   - Pre-conditions needed
+   - Attack prerequisites
+   - Required tools and resources
+   - Estimated difficulty level
+
+**2. EXPLOITATION STEPS**:
+   - Step-by-step methodology
+   - Commands/scripts to use
+   - Expected responses
+   - Alternative approaches
+
+**3. PROOF OF CONCEPT**:
+   - Safe PoC that demonstrates the vulnerability
+   - Non-destructive testing approach
+   - Evidence collection methods
+
+**4. POST-EXPLOITATION**:
+   - What access/data can be obtained
+   - Privilege escalation opportunities
+   - Lateral movement possibilities
+   - Persistence mechanisms
+
+**5. DETECTION & BLUE TEAM PERSPECTIVE**:
+   - How this attack can be detected
+   - Logs/alerts that would trigger
+   - IOCs (Indicators of Compromise)
+   - Defense recommendations
+
+**6. REMEDIATION PRIORITY**:
+   - Business impact assessment
+   - Fix complexity
+   - Recommended timeline
+   - Compensating controls
+
+**IMPORTANT REMINDERS**:
+- Only exploit in authorized scope
+- Document all actions
+- Maintain professional ethics
+- Report findings responsibly
+
+Provide practical, ethical exploitation guidance for professional pentesters."""
+
+        return prompt
+
+    @staticmethod
+    def get_executive_summary_prompt(scan_results: Dict[str, Any], findings: List[Dict[str, Any]]) -> str:
+        """
+        Generate prompt for executive summary report
+
+        Used by: modules/reporting/report_generator.py
+
+        Creates a high-level summary suitable for C-level executives and management.
+        """
+        total_findings = len(findings)
+        critical = sum(1 for f in findings if f.get('severity', '').lower() == 'critical')
+        high = sum(1 for f in findings if f.get('severity', '').lower() == 'high')
+        medium = sum(1 for f in findings if f.get('severity', '').lower() == 'medium')
+        low = sum(1 for f in findings if f.get('severity', '').lower() == 'low')
+
+        prompt = f"""You are a Chief Information Security Officer (CISO) writing an executive summary for the board of directors.
+
+**Assessment Overview**:
+- Total Findings: {total_findings}
+- Critical: {critical}
+- High: {high}
+- Medium: {medium}
+- Low: {low}
+
+**Scan Results**:
+{scan_results}
+
+**Key Findings**:
+{findings}
+
+Write a professional executive summary that includes:
+
+**1. EXECUTIVE OVERVIEW** (2-3 paragraphs):
+   - Overall security posture assessment
+   - Business risk summary
+   - Key takeaways for executives
+
+**2. RISK ASSESSMENT**:
+   - **Critical Risks**: Immediate threats to business operations
+   - **High Priority Issues**: Significant vulnerabilities requiring attention
+   - **Business Impact**: Potential financial, reputational, and operational impact
+   - **Compliance Implications**: Regulatory or compliance concerns
+
+**3. KEY METRICS**:
+   - Security score/rating
+   - Comparison to industry benchmarks
+   - Trend analysis (if available)
+   - Risk exposure quantification
+
+**4. STRATEGIC RECOMMENDATIONS**:
+   - Top 3-5 priority actions
+   - Resource requirements (budget, personnel)
+   - Estimated timeline for remediation
+   - Quick wins vs. long-term initiatives
+
+**5. BUSINESS CONTEXT**:
+   - How vulnerabilities affect business objectives
+   - Customer/stakeholder impact
+   - Competitive risk considerations
+   - Market/industry implications
+
+**TONE & STYLE**:
+- Write for non-technical executives
+- Use business language, not technical jargon
+- Focus on risk, impact, and ROI
+- Be concise and action-oriented
+- Use metrics and quantifiable data
+- Highlight both problems AND solutions
+
+**LENGTH**: 1-2 pages maximum. Executives are busy - be succinct but comprehensive."""
+
+        return prompt
+
+    @staticmethod
+    def get_technical_report_prompt(scan_results: Dict[str, Any], findings: List[Dict[str, Any]], detailed_data: Dict[str, Any]) -> str:
+        """
+        Generate prompt for technical security report
+
+        Used by: modules/reporting/report_generator.py
+
+        Creates a detailed technical report for security teams and engineers.
+        """
+        prompt = f"""You are a senior security analyst writing a comprehensive technical security report.
+
+**Scan Results Summary**:
+{scan_results}
+
+**Findings** ({len(findings)} total):
+{findings}
+
+**Detailed Technical Data**:
+{detailed_data}
+
+Create a detailed technical report with the following sections:
+
+**1. EXECUTIVE SUMMARY** (Brief - 1 paragraph):
+   - High-level technical overview
+   - Critical findings count
+   - Overall risk assessment
+
+**2. METHODOLOGY**:
+   - Assessment scope
+   - Tools and techniques used
+   - Testing timeline
+   - Limitations and constraints
+
+**3. TECHNICAL FINDINGS** (Detailed):
+   For EACH finding, include:
+   - **Finding ID**: Unique identifier
+   - **Title**: Clear, descriptive title
+   - **Severity**: Critical/High/Medium/Low with justification
+   - **CVSS Score**: If applicable
+   - **CWE/CVE**: Classification
+   - **Affected Systems/Components**: What is vulnerable
+   - **Technical Description**:
+     * How the vulnerability works
+     * Attack vector and complexity
+     * Required privileges
+     * User interaction needed
+   - **Proof of Concept**:
+     * Commands/requests used
+     * Screenshots or output
+     * Step-by-step reproduction
+   - **Impact Analysis**:
+     * Confidentiality impact
+     * Integrity impact
+     * Availability impact
+     * Scope of compromise
+   - **Remediation**:
+     * Specific fix recommendations
+     * Code examples or configurations
+     * Patch information
+     * Workarounds if no patch available
+   - **Verification**:
+     * How to verify the fix
+     * Regression testing steps
+   - **References**:
+     * OWASP guidelines
+     * Vendor advisories
+     * Security best practices
+
+**4. NETWORK TOPOLOGY & ATTACK SURFACE**:
+   - Network diagram (description)
+   - Open ports and services
+   - Trust boundaries
+   - Attack paths identified
+
+**5. COMPLIANCE MAPPING**:
+   - Map findings to compliance frameworks:
+     * OWASP Top 10
+     * CIS Controls
+     * NIST CSF
+     * PCI-DSS (if applicable)
+     * ISO 27001 (if applicable)
+
+**6. RISK ANALYSIS**:
+   - Risk matrix (likelihood × impact)
+   - Exploitability assessment
+   - Business context for each risk
+
+**7. REMEDIATION ROADMAP**:
+   - **Phase 1 (Immediate - 0-30 days)**: Critical fixes
+   - **Phase 2 (Short-term - 30-90 days)**: High priority
+   - **Phase 3 (Medium-term - 90-180 days)**: Medium priority
+   - **Phase 4 (Long-term - 180+ days)**: Low priority & improvements
+
+**8. APPENDICES**:
+   - A: Vulnerability details (raw data)
+   - B: Tool output (scan logs)
+   - C: Affected systems inventory
+   - D: Glossary of terms
+   - E: References and resources
+
+**TECHNICAL DEPTH**:
+- Include commands, code snippets, and technical details
+- Provide sufficient detail for engineers to reproduce and fix
+- Use industry-standard terminology
+- Include packet captures, logs, or screenshots where relevant
+- Reference CVEs, CWEs, and security standards
+
+**FORMAT**:
+- Use clear headings and subheadings
+- Include tables for structured data
+- Use code blocks for technical content
+- Add severity indicators (color coding suggestions)
+- Include timestamps and metadata
+
+This report will be used by security engineers, developers, and system administrators for remediation."""
+
+        return prompt

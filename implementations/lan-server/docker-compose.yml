@@ -49,9 +49,17 @@ services:
     environment:
       # Database
       - DATABASE_URL=postgresql://${POSTGRES_USER:-sec_llama}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-sec_llama}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-sec_llama}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB:-sec_llama}
 
       # Redis
       - REDIS_URL=redis://:${REDIS_PASSWORD:-secllama}@redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-secllama}
 
       # Remote LLM Configuration (Ollama or LM Studio)
       - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
@@ -78,6 +86,11 @@ services:
       - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true}
       - RATE_LIMIT_REQUESTS=${RATE_LIMIT_REQUESTS:-100}
       - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-60}
+
+      # Default Admin User (created on first run)
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@sec-llama.local}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-ChangeMeOnFirstLogin123!}
 
     ports:
       - "${WEB_UI_PORT:-8080}:8080"

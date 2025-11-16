@@ -7,6 +7,7 @@ Provides endpoints for querying audit logs.
 from datetime import datetime, timedelta
 from typing import List, Optional
 import sys
+import os
 from pathlib import Path
 import json
 
@@ -18,9 +19,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 router = APIRouter()
 
-# Audit log file path
-AUDIT_LOG_PATH = Path("/home/user/Sec-llama/logs/mcp_audit.log")
-AUDIT_DB_PATH = Path("/home/user/Sec-llama/database/audit_logs.json")
+# Audit log file paths - use environment variables or relative paths
+LOGS_DIR = Path(os.getenv("LOGS_DIR", "./logs"))
+DB_DIR = Path(os.getenv("DATABASE_DIR", "./database"))
+AUDIT_LOG_PATH = LOGS_DIR / "mcp_audit.log"
+AUDIT_DB_PATH = DB_DIR / "audit_logs.json"
+
+# Ensure directories exist
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+DB_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class AuditLogEntry(BaseModel):

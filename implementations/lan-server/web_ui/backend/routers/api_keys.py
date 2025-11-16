@@ -7,6 +7,7 @@ Provides endpoints for managing MCP server API keys.
 from datetime import datetime
 from typing import List, Optional
 import sys
+import os
 from pathlib import Path
 import secrets
 import hashlib
@@ -27,8 +28,12 @@ from web_ui.backend.models.api_key import (
 
 router = APIRouter()
 
-# API Keys database file (simple JSON for now)
-KEYS_DB_PATH = Path("/home/user/Sec-llama/database/api_keys.json")
+# API Keys database file (simple JSON for now) - use environment variable or relative path
+DB_DIR = Path(os.getenv("DATABASE_DIR", "./database"))
+KEYS_DB_PATH = DB_DIR / "api_keys.json"
+
+# Ensure database directory exists
+DB_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_keys_db() -> dict:

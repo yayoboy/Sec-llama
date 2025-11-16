@@ -6,6 +6,7 @@ Endpoints for managing AI/LLM configuration and models.
 
 import time
 import asyncio
+import os
 from typing import List
 import sys
 from pathlib import Path
@@ -33,8 +34,12 @@ from web_ui.backend.models.ai_config import (
 
 router = APIRouter()
 
-# Configuration file path
-CONFIG_PATH = Path("/home/user/Sec-llama/config/mcp_server_config.yaml")
+# Configuration file path - use environment variable or relative path
+CONFIG_DIR = Path(os.getenv("CONFIG_DIR", "./config"))
+CONFIG_PATH = CONFIG_DIR / "mcp_server_config.yaml"
+
+# Ensure config directory exists
+CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_config() -> dict:

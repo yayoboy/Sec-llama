@@ -41,6 +41,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     libssl-dev \
     libffi-dev \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app user (non-root)
@@ -58,12 +59,19 @@ COPY core/ ./core/
 COPY modules/ ./modules/
 COPY web_ui/backend/ ./web_ui/backend/
 COPY config/ ./config/
+COPY database/ ./database/
+COPY alembic/ ./alembic/
+COPY alembic.ini ./
+
+# Copy entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Copy frontend build from previous stage
 COPY --from=frontend-builder /frontend/dist ./web_ui/frontend/dist
 
 # Create necessary directories
-RUN mkdir -p /app/logs /app/reports /app/database /app/static && \
+RUN mkdir -p /app/logs /app/reports /app/database /app/uploads /app/backups && \
     chown -R secllama:secllama /app
 
 # Switch to non-root user
@@ -73,8 +81,8 @@ USER secllama
 EXPOSE 8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8080/api/health || exit 1
 
-# Run the application
-CMD ["uvicorn", "web_ui.backend.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Run the application via entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]

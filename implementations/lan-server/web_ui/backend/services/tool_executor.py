@@ -18,6 +18,20 @@ from web_ui.backend.models.tool import (
     ToolStatus, ToolExecutionResponse, ToolInfo, ToolExecutionHistory
 )
 
+# Import security modules
+from modules.network.discovery.host_discovery import HostDiscovery
+from modules.network.scanning.port_scanner import PortScanner
+from modules.vuln_scanner.code_scanner import CodeScanner
+from modules.threat_intel.cve_lookup import CVELookup
+from modules.network.wireless.wifi_audit import WifiAuditor
+from modules.network.traffic.packet_analyzer import PacketAnalyzer
+from modules.container_security.docker_scanner import DockerScanner
+from modules.api_security.api_fuzzer import APIFuzzer
+from modules.log_analyzer.log_parser import LogParser
+from modules.threat_intel.ioc_analyzer import IOCAnalyzer
+from modules.code_review.git_reviewer import GitReviewer
+from modules.pentest_assistant.attack_planner import AttackPlanner
+
 
 class ToolExecutor:
     """Service for executing MCP tools"""

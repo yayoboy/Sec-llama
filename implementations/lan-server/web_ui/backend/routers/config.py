@@ -7,6 +7,7 @@ Provides endpoints for managing MCP server configuration.
 from datetime import datetime
 from typing import Dict, Any
 import sys
+import os
 from pathlib import Path
 import shutil
 import yaml
@@ -26,9 +27,14 @@ from web_ui.backend.models.config import (
 
 router = APIRouter()
 
-# Configuration file path
-CONFIG_PATH = Path("/home/user/Sec-llama/config/mcp_server_config.yaml")
-BACKUP_DIR = Path("/home/user/Sec-llama/config/backups")
+# Configuration file paths - use environment variables or relative paths
+CONFIG_DIR = Path(os.getenv("CONFIG_DIR", "./config"))
+CONFIG_PATH = CONFIG_DIR / "mcp_server_config.yaml"
+BACKUP_DIR = CONFIG_DIR / "backups"
+
+# Ensure directories exist
+CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+BACKUP_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_config() -> Dict[str, Any]:
