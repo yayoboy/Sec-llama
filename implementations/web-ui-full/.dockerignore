@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs
+web_ui/frontend/dist/
+web_ui/frontend/build/
+*.tsbuildinfo
+
+# Logs and databases
+logs/
+*.log
+database/
+*.db
+*.sqlite
+
+# Reports
+reports/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config with secrets
+.env
+config.yaml
+*.key
+*.pem
+
+# Cache
+.pytest_cache/
+.coverage
+htmlcov/
+.nuxt/
+.cache/
+
+# Static files (generated)
+static/

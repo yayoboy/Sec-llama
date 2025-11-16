@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Logs and databases
+logs/
+*.log
+database/
+*.db
+*.sqlite
+
+# Reports
+reports/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config with secrets
+.env
+config.yaml
+*.key
+*.pem
+
+# Docker
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+
+# Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Git
+.git/
+.gitignore

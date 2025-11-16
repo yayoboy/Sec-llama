@@ -64,8 +64,8 @@ services:
   # MCP HTTP Server
   mcp-server:
     build:
-      context: ../../
-      dockerfile: implementations/mcp-http/Dockerfile
+      context: .
+      dockerfile: Dockerfile.mcp
     container_name: sec-llama-mcp-dev
     environment:
       - OLLAMA_HOST=http://ollama:11434
@@ -76,8 +76,9 @@ services:
     ports:
       - "${MCP_PORT:-8765}:8765"
     volumes:
-      - ../../shared:/app/shared:ro
       - ./logs/mcp:/app/logs
+      - ./reports:/app/reports
+      - ./database:/app/database
     depends_on:
       postgres:
         condition: service_healthy
@@ -97,8 +98,8 @@ services:
   # Web UI (Development Mode)
   web-ui:
     build:
-      context: ../../
-      dockerfile: implementations/web-ui-full/Dockerfile.dev
+      context: .
+      dockerfile: Dockerfile
     container_name: sec-llama-web-ui-dev
     environment:
       - OLLAMA_HOST=http://ollama:11434
@@ -112,11 +113,12 @@ services:
       - "${WEB_UI_PORT:-8080}:8080"
       - "${FRONTEND_DEV_PORT:-3000}:3000"
     volumes:
-      - ../../shared:/app/shared:ro
-      - ../../implementations/web-ui-full/backend:/app/backend
-      - ../../implementations/web-ui-full/frontend:/app/frontend
+      - ./web:/app/web
+      - ./cli:/app/cli
+      - ./modules:/app/modules
       - ./logs/web-ui:/app/logs
       - ./reports:/app/reports
+      - ./database:/app/database
     depends_on:
       postgres:
         condition: service_healthy

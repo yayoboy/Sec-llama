@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+
+# Logs and databases
+logs/
+*.log
+database/
+*.db
+*.sqlite
+
+# Reports
+reports/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config with secrets
+.env
+config.yaml
+*.key
+*.pem
+*.crt
+
+# Docker
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+docker-stack/
+
+# Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Git
+.git/
+.gitignore
+
+# Scripts (not needed in image)
+scripts/
+*.sh
