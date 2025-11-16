@@ -427,3 +427,34 @@ Headers di risposta:
 ---
 
 **Note:** Per uso locale con Claude Desktop, considera [MCP stdio](../mcp-stdio/README.md) che è più semplice da configurare.
+
+---
+
+## 🐳 Installazione con Portainer
+
+Per deployare in Portainer:
+
+### Quick Deploy
+
+1. **Portainer** → **Stacks** → **Add Stack**
+2. **Name**: `sec-llama-mcp`
+3. **Upload**: Seleziona `portainer-stack.yml`
+4. **Environment variables**: Copia da `portainer-env.txt`
+5. Genera API key sicura:
+   ```bash
+   python3 -c "import secrets; print(secrets.token_hex(32))"
+   ```
+6. **Deploy the stack**
+
+### Post-Deploy
+
+```bash
+# Pull modello
+docker exec -it <ollama-container> ollama pull llama3.1:8b
+
+# Test
+curl http://localhost:8765/health
+```
+
+📖 **[Guida Completa Portainer](../../docs/PORTAINER_INSTALL.md)**
+

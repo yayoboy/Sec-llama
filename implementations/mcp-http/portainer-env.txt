@@ -1,0 +1,17 @@
+# Environment Variables for Portainer Stack - MCP HTTP
+# Copy and paste these in Portainer Stack Environment Variables section
+
+# Ollama
+OLLAMA_PORT=11434
+OLLAMA_MODEL=llama3.1:8b
+
+# MCP Server
+MCP_PORT=8765
+MCP_API_KEYS=CHANGE_THIS_TO_SECURE_API_KEY
+LOG_LEVEL=INFO
+ALLOWED_ORIGINS=*
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_REQUESTS=60
+
+# Generate secure API key with:
+# python3 -c "import secrets; print(secrets.token_hex(32))"

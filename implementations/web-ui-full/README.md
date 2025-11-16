@@ -159,3 +159,35 @@ tail -f logs/web_ui.log
 - Verifica Ollama sia running: `curl http://localhost:11434/api/tags`
 - Controlla host in AI Configuration
 - Test connection nella Web UI
+
+---
+
+## 🐳 Installazione con Portainer
+
+Per deployare in Portainer:
+
+### Metodo 1: Upload Stack File
+
+1. **Portainer** → **Stacks** → **Add Stack**
+2. **Name**: `sec-llama-web-ui`
+3. **Upload**: Seleziona `portainer-stack.yml`
+4. **Environment variables**: Copia da `portainer-env.txt`
+5. **Deploy the stack**
+
+### Metodo 2: Git Repository
+
+1. **Portainer** → **Stacks** → **Add Stack**
+2. **Repository URL**: `https://github.com/yourusername/Sec-llama.git`
+3. **Compose path**: `implementations/web-ui-full/docker-compose.yml`
+4. **Environment variables**: Imposta variabili
+5. **Deploy**
+
+### Post-Deploy
+
+```bash
+# Pull modello Ollama
+docker exec -it <ollama-container-id> ollama pull llama3.1:8b
+```
+
+📖 **[Guida Completa Portainer](../../docs/PORTAINER_INSTALL.md)**
+
